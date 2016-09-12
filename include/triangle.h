@@ -21,6 +21,7 @@ public:
 private:
   Vertex mV0, mV1, mV2;
   Color mColor;
+  glm::vec3 mNormal;
 };
 
 
