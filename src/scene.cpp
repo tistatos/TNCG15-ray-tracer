@@ -9,8 +9,14 @@
 #include "vertex.h"
 #include "color.h"
 #include "surface.h"
+#include "sphere.h"
 
 Scene::Scene() {
+  mObjects.push_back(
+      new Sphere(5.0f,
+        Vertex(3.0f, 0.0f, 0.0f),
+        Color(1.0,1.0, 0))
+      );
   //Floor
   mObjects.push_back(
       new Surface(
