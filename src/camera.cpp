@@ -13,14 +13,16 @@
 #include <iostream>
 #include <cmath>
 
-void savePPM(const char* fileName, Pixel* p) {
+void savePPM(const char* fileName, Pixel* p, double maxR, double maxG, double maxB) {
   FILE *f = fopen(fileName, "w");
   fprintf(f, "P3\n%d %d\n%d\n", CAMERA_RESOLUTION, CAMERA_RESOLUTION, 255);
 
   for (unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i) {
-    fprintf(f, "%d %d %d ", int(p[i].color.r *255), int(p[i].color.g * 255), int(p[i].color.b * 255));
+    fprintf(f, "%d %d %d ",
+        int(p[i].color.r * 255.99/ maxR),
+        int(p[i].color.g * 255.99 / maxG),
+        int(p[i].color.b * 255.99 / maxB));
   }
-
   fclose(f);
 }
 
@@ -31,7 +33,9 @@ Camera::Camera(Vertex leftEye, Vertex rightEye)
 
 
 Camera::~Camera() {
-  delete mPixels;
+  for(unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i)
+    delete mPixels[i].ray;
+  delete[] mPixels;
 }
 
 void Camera::render(Scene scene) {
@@ -55,11 +59,17 @@ void Camera::render(Scene scene) {
           break;
         }
       }
-      delete r;
     }
   }
 }
 
 void Camera::createImage(const char* fileName) {
-  savePPM(fileName, mPixels);
+  double maxR, maxG, maxB = 0.0;
+  for(unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i) {
+    maxR = std::max(maxR, mPixels[i].color.r);
+    maxG = std::max(maxG, mPixels[i].color.g);
+    maxB = std::max(maxB, mPixels[i].color.b);
+  }
+
+  savePPM(fileName, mPixels, maxR, maxG, maxB);
 }
