@@ -9,16 +9,14 @@
 #define __INTERSECTABLE_H__
 
 #include "ray.h"
-#include "direction.h"
+
+#define EPSILON 0.000001
 
 class Ray;
 
 class Intersectable {
 public:
-  virtual bool rayIntersection(Ray* r) = 0;
-
-protected:
-  Direction mNormal;
+  virtual bool rayIntersection(Ray* r, float &tOut) = 0;
 };
 
 

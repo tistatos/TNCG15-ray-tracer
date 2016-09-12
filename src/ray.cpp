@@ -7,4 +7,14 @@
 
 #include "ray.h"
 
-Ray::Ray(Vertex start, Vertex end) : mStart(start), mEnd(end) { }
+Ray::Ray(Vertex start, Vertex end, Color color) : start(start), end(end), color(color) {
+  this->end = glm::normalize(end-start);
+}
+
+void Ray::setIntersection(Intersectable* intersect) {
+  mIntersect = intersect;
+}
+
+float Ray::length() {
+  return glm::length(end-start);
+}

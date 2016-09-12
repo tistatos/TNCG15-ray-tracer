@@ -8,18 +8,19 @@
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
 
-#include "intersectable.h"
+#include "ray.h"
 #include "color.h"
+#include "intersectable.h"
 
-class Triangle : Intersectable {
+class Triangle : public Intersectable {
 public:
-  Triangle(Vertex v0, Vertex v1, Vertex v2);
+  Triangle();
   Triangle(Vertex v0, Vertex v1, Vertex v2, Color c);
-  bool rayIntersection(Ray* r) { return false; }
+  bool rayIntersection(Ray* r, float &tOut);
 
 private:
-  Color mColor;
   Vertex mV0, mV1, mV2;
+  Color mColor;
 };
 
 

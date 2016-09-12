@@ -12,7 +12,7 @@ class Color {
 public:
   Color();
   Color(double r, double g, double b);
-  double mR, mG, mB;
+  double r, g, b;
 };
 
 

@@ -7,6 +7,5 @@
 
 #include "color.h"
 
-Color::Color() : Color(1.0, 1.0, 1.0) { }
-
-Color::Color(double r, double g, double b) : mR(r), mG(g), mB(b) { }
+Color::Color() : r(0.0), g(0.0), b(0.0) { }
+Color::Color(double r, double g, double b) : r(r), g(g), b(b) { }
