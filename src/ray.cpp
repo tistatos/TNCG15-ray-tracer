@@ -8,6 +8,10 @@
 #include "ray.h"
 
 Ray::Ray(Vertex start, Vertex end, Color color) : start(start), end(end), color(color) {
+  this->normalize();
+}
+
+void Ray::normalize() {
   this->end = glm::normalize(end-start);
 }
 

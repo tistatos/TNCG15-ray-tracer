@@ -42,6 +42,7 @@ void Camera::render(Scene scene) {
   std::vector<SceneObject*> sceneObjects = scene.getObjects();
   for(unsigned int y = 0; y < CAMERA_RESOLUTION; ++y) {
     for(unsigned int x = 0; x < CAMERA_RESOLUTION; ++x) {
+      //TODO: Implement random supersampling
       Pixel p = mPixels[x+CAMERA_RESOLUTION*y];
 
       Ray* r = new Ray(

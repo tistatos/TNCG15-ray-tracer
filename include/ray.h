@@ -21,9 +21,12 @@ public:
 
   void setIntersection(Intersectable* intersect);
   float length();
+  void normalize();
 
   Vertex start, end;
   Color color;
+  float importance = 1.0f;
+
 private:
   Intersectable* mIntersect;
 };
