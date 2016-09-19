@@ -8,13 +8,11 @@
 #include "triangle.h"
 #include <iostream>
 
-Triangle::Triangle() :
-  mColor(0.0, 0.0, 0.0) { }
+Triangle::Triangle() { }
 
-Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2, Color c) :
-  mV0(v0), mV1(v1), mV2(v2), mColor(c) {
+Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2) :
+  mV0(v0), mV1(v1), mV2(v2) {
     mNormal = glm::normalize(glm::cross(v1-v2, v0-v2));
-
   }
 
 bool Triangle::rayIntersection(Ray* r, float &tOut) {

@@ -15,12 +15,11 @@
 class Triangle : public Intersectable {
 public:
   Triangle();
-  Triangle(Vertex v0, Vertex v1, Vertex v2, Color c);
+  Triangle(Vertex v0, Vertex v1, Vertex v2);
   bool rayIntersection(Ray* r, float &tOut);
 
 private:
   Vertex mV0, mV1, mV2;
-  Color mColor;
   glm::vec3 mNormal;
 };
 

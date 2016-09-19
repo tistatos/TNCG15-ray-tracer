@@ -8,9 +8,9 @@
 #include "sphere.h"
 #include <cmath>
 
-Sphere::Sphere(float radius, Vertex position, Color c) :
+Sphere::Sphere(float radius, Vertex position, Surface* surface) :
   mPosition(position), mRadius(radius) {
-    mColor = c;
+    this->surface = surface;
   }
 
 bool Sphere::rayIntersection(Ray* ray, float &tOut) {

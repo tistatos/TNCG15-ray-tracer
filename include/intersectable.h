@@ -7,16 +7,20 @@
 
 #ifndef __INTERSECTABLE_H__
 #define __INTERSECTABLE_H__
-
+#include "surface.h"
 #include "ray.h"
 
 #define EPSILON 0.000001
 
+
 class Ray;
+class Surface;
 
 class Intersectable {
 public:
+  ~Intersectable() { delete surface; }
   virtual bool rayIntersection(Ray* r, float &tOut) = 0;
+  Surface* surface;
 };
 
 

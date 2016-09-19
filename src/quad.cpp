@@ -9,12 +9,12 @@
 #include "vertex.h"
 #include "color.h"
 
-Quad::Quad(Vertex topRight, Vertex topLeft, Vertex bottomLeft, Vertex bottomRight, Color color) {
+Quad::Quad(Vertex topRight, Vertex topLeft, Vertex bottomLeft, Vertex bottomRight, Surface* surface) {
   mTriangles = new Triangle[2];
-  mColor = color;
+  this->surface = surface;
 
-  mTriangles[0] = Triangle( topRight, topLeft, bottomRight, color);
-  mTriangles[1] = Triangle( bottomLeft, bottomRight, topLeft, color);
+  mTriangles[0] = Triangle( topRight, topLeft, bottomRight);
+  mTriangles[1] = Triangle( bottomLeft, bottomRight, topLeft);
 }
 
 bool Quad::rayIntersection(Ray* r, float &tOut) {

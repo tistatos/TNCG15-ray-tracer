@@ -11,15 +11,15 @@
 #include "triangle.h"
 #include "ray.h"
 #include "intersectable.h"
+#include "surface.h"
 
 class SceneObject : public Intersectable {
 public:
-  Color getColor() { return mColor; }
+  Color getColor() { return surface->color; }
   virtual bool rayIntersection(Ray* r, float &tOut) = 0;
 
 protected:
   Triangle* mTriangles;
-  Color mColor;
 };
 
 

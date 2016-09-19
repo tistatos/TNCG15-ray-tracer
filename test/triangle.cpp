@@ -15,8 +15,7 @@ TEST(triangle, Intersection) {
   Triangle t(
       Vertex(-1.0f, 0.5f, 0.0f),
       Vertex(-1.0f, 0.0f, 1.0f),
-      Vertex(-1.0f, -0.5f, 0.0f),
-      Color(1.0, 0.0, 0.0));
+      Vertex(-1.0f, -0.5f, 0.0f));
 
   Ray r(
       Vertex(0.0f, 0.0f, 0.0f),
@@ -49,5 +48,5 @@ TEST(triangle, Intersection) {
   tOut = 0;
   intersected = t.rayIntersection(&r3, tOut);
 
-  ASSERT_FALSE(intersected) << "intersection is expected";
+  ASSERT_FALSE(intersected) << "intersection not expected";
 }
