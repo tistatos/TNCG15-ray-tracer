@@ -16,7 +16,7 @@ int main() {
 
   Scene scene;
 
-  camera.render(scene);
+  camera.render(&scene);
   camera.createImage("result.ppm");
 
   return 0;

@@ -13,6 +13,7 @@
 class Quad : public SceneObject {
 public:
   Quad(Vertex topLeft, Vertex topRight, Vertex bottomLeft, Vertex bottomRight, Surface* surface);
+  ~Quad();
 
   bool rayIntersection(Ray* r, float &tOut);
 };

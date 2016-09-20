@@ -38,8 +38,8 @@ Camera::~Camera() {
   delete[] mPixels;
 }
 
-void Camera::render(Scene scene) {
-  std::vector<SceneObject*> sceneObjects = scene.getObjects();
+void Camera::render(Scene* scene) {
+  std::vector<SceneObject*> sceneObjects = scene->getObjects();
   for(unsigned int y = 0; y < CAMERA_RESOLUTION; ++y) {
     for(unsigned int x = 0; x < CAMERA_RESOLUTION; ++x) {
       //TODO: Implement random supersampling
@@ -52,20 +52,22 @@ void Camera::render(Scene scene) {
 
       p.ray = r;
       std::vector<SceneObject*>::iterator it = sceneObjects.begin();
+      float tCurrent = FLT_MAX;
       for(; it != sceneObjects.end(); it++) {
         float tOut = 0.0f;
-        if((*it)->rayIntersection(p.ray, tOut)) {
-          mPixels[x+y*CAMERA_RESOLUTION].setColor(
+        if((*it)->rayIntersection(p.ray, tOut) && tOut < tCurrent) {
+          tCurrent = tOut;
+          p.setColor(
               (*it)->getColor());
-          break;
         }
       }
+      mPixels[x+CAMERA_RESOLUTION*y] = p;
     }
   }
 }
 
 void Camera::createImage(const char* fileName) {
-  double maxR, maxG, maxB = 0.0;
+  double maxR = 0.0, maxG = 0.0, maxB = 0.0;
   for(unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i) {
     maxR = std::max(maxR, mPixels[i].color.r);
     maxG = std::max(maxG, mPixels[i].color.g);

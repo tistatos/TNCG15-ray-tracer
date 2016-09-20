@@ -15,6 +15,7 @@
 class Triangle : public Intersectable {
 public:
   Triangle();
+  ~Triangle();
   Triangle(Vertex v0, Vertex v1, Vertex v2);
   bool rayIntersection(Ray* r, float &tOut);
 

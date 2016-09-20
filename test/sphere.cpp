@@ -12,6 +12,7 @@
 
 TEST(sphereTest, intersection) {
   Sphere s( 1.0f, Vertex(-5.0f, 0.0f, 0.0f), new Surface(Color(0.0,0.0,0.0)));
+  Sphere s2( 2.0f, Vertex(-5.0f, 0.0f, 0.0f), new Surface(Color(0.0,0.0,0.0)));
 
   Ray r(Vertex(), Vertex(-1.0f, 0.f, 0.f), Color(0.0, 0.0, 0.0));
 
@@ -20,5 +21,11 @@ TEST(sphereTest, intersection) {
   intersected = s.rayIntersection(&r, tOut);
 
   EXPECT_TRUE(intersected) << "Intersection with sphere expected";
-  EXPECT_FLOAT_EQ(tOut, 4.0f) << "distance to sphere should be 5";
+  EXPECT_FLOAT_EQ(tOut, 4.0f) << "distance to sphere should be 4";
+
+  tOut = 0;
+  intersected = false;
+  intersected = s2.rayIntersection(&r, tOut);
+  //EXPECT_TRUE(intersected) << "Intersection with sphere expected";
+  //EXPECT_FLOAT_EQ(tOut, 3.0f) << "distance to sphere should be 4";
 }

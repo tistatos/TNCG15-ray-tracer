@@ -11,7 +11,11 @@
 Sphere::Sphere(float radius, Vertex position, Surface* surface) :
   mPosition(position), mRadius(radius) {
     this->surface = surface;
-  }
+}
+
+Sphere::~Sphere() {
+  delete surface;
+}
 
 bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   glm::vec3 o = ray->start;

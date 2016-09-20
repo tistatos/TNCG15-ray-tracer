@@ -13,7 +13,11 @@ Triangle::Triangle() { }
 Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2) :
   mV0(v0), mV1(v1), mV2(v2) {
     mNormal = glm::normalize(glm::cross(v1-v2, v0-v2));
-  }
+}
+
+Triangle::~Triangle() {
+  //delete surface;
+}
 
 bool Triangle::rayIntersection(Ray* r, float &tOut) {
   Vertex T = r->start - mV0;

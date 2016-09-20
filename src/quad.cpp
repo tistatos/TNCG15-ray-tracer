@@ -17,6 +17,10 @@ Quad::Quad(Vertex topRight, Vertex topLeft, Vertex bottomLeft, Vertex bottomRigh
   mTriangles[1] = Triangle( bottomLeft, bottomRight, topLeft);
 }
 
+Quad::~Quad() {
+  delete surface;
+  delete[] mTriangles;
+}
 bool Quad::rayIntersection(Ray* r, float &tOut) {
   bool intersects = mTriangles[0].rayIntersection(r, tOut) || mTriangles[1].rayIntersection(r, tOut);
 

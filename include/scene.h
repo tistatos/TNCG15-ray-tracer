@@ -14,6 +14,7 @@
 class Scene {
 public:
   Scene();
+  ~Scene();
   void addObject(SceneObject* object);
   std::vector<SceneObject*> getObjects();
 

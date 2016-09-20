@@ -18,7 +18,7 @@ class Surface;
 
 class Intersectable {
 public:
-  ~Intersectable() { delete surface; }
+  virtual ~Intersectable() { }
   virtual bool rayIntersection(Ray* r, float &tOut) = 0;
   Surface* surface;
 };

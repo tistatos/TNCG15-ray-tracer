@@ -19,7 +19,7 @@ public:
   Camera(Vertex leftEye, Vertex rightEye);
   ~Camera();
 
-  void render(Scene scene);
+  void render(Scene* scene);
   void createImage(const char* fileName);
 
 private:

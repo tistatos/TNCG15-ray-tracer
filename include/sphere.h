@@ -13,6 +13,7 @@
 class Sphere : public SceneObject {
 public:
   Sphere(float radius, Vertex position, Surface* s);
+  ~Sphere();
   bool rayIntersection(Ray* r, float &tOut);
 
 private:
