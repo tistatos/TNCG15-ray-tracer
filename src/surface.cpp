@@ -6,15 +6,17 @@
 */
 
 #include "surface.h"
+#include <iostream>
 
 Surface::Surface() : Surface(Color(0.0, 0.0, 0.0), kDiffuse) { }
 
-Surface::Surface(Color color) : Surface(color, kDiffuse, Vertex()) { }
+Surface::Surface(Color color) : Surface(color, kDiffuse) { }
 
-Surface::Surface(Color color, eReflectionType rType) : Surface(color, rType, Vertex()) { }
-
-Surface::Surface(Color color, eReflectionType rType, Vertex emission) {
-  this->color = color;
+Surface::Surface(Color color, eReflectionType rType) : Surface(color, Vertex()) {
   this->mReflectionType = rType;
+}
+
+Surface::Surface(Color color, Vertex emission) {
+  this->color = color;
   this->mEmission = emission;
 }

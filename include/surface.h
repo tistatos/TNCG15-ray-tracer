@@ -23,10 +23,13 @@ public:
   Surface();
   Surface(Color c);
   Surface(Color c, eReflectionType rType);
-  Surface(Color c, eReflectionType rType, Vertex emission);
+  Surface(Color c, Vertex emission);
+
+
   Color color;
 
 private:
+  const float glassRefract = 1.5f;
   eReflectionType mReflectionType;
   glm::vec3 mEmission;
 };
