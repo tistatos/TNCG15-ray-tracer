@@ -11,6 +11,8 @@
 #include "sceneObject.h"
 #include <vector>
 
+#define SceneIterator std::vector<SceneObject*>::iterator
+
 class Scene {
 public:
   Scene();

@@ -7,12 +7,12 @@
 
 #include "ray.h"
 
-Ray::Ray(Vertex start, Vertex end, Color color) : start(start), end(end), color(color) {
+Ray::Ray(glm::vec3 start, glm::vec3 direction, Color color) : start(start), direction(direction), color(color) {
   this->normalize();
 }
 
 void Ray::normalize() {
-  this->end = glm::normalize(end-start);
+  direction = glm::normalize(direction);
 }
 
 void Ray::setIntersection(Intersectable* intersect) {
@@ -20,5 +20,5 @@ void Ray::setIntersection(Intersectable* intersect) {
 }
 
 float Ray::length() {
-  return glm::length(end-start);
+  return glm::length(direction);
 }

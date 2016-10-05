@@ -6,20 +6,20 @@
 */
 
 #include <gtest/gtest.h>
+#include <glm/glm.hpp>
 #include "triangle.h"
-#include "vertex.h"
 #include "ray.h"
 
 TEST(triangle, Intersection) {
 
   Triangle t(
-      Vertex(-1.0f, 0.5f, 0.0f),
-      Vertex(-1.0f, 0.0f, 1.0f),
-      Vertex(-1.0f, -0.5f, 0.0f));
+      glm::vec3(-1.0f, 0.5f, 0.0f),
+      glm::vec3(-1.0f, 0.0f, 1.0f),
+      glm::vec3(-1.0f, -0.5f, 0.0f));
 
   Ray r(
-      Vertex(0.0f, 0.0f, 0.0f),
-      Vertex(-2.0f, 0.0f, 0.0f),
+      glm::vec3(0.0f, 0.0f, 0.0f),
+      glm::vec3(-2.0f, 0.0f, 0.0f),
       Color(0.0, 0.0, 0.0) );
 
   float tOut = 0;
@@ -30,8 +30,8 @@ TEST(triangle, Intersection) {
   EXPECT_FLOAT_EQ(tOut, 1.0f) << "Distance from ray origin to triangle should be 1";
 
   Ray r2(
-      Vertex(0.0f, 0.0f, 0.0f),
-      Vertex(-1.0f, 0.49f, 0.0f),
+      glm::vec3(0.0f, 0.0f, 0.0f),
+      glm::vec3(-1.0f, 0.49f, 0.0f),
       Color(0.0, 0.0, 0.0) );
 
   tOut = 0;
@@ -41,8 +41,8 @@ TEST(triangle, Intersection) {
   EXPECT_GT(tOut, 1.0f) << "Distance from ray origin to triangle should be greater than 1";
 
   Ray r3(
-      Vertex(0.0f, 0.0f, 0.0f),
-      Vertex(1.0f, 0.49f, 0.0f),
+      glm::vec3(0.0f, 0.0f, 0.0f),
+      glm::vec3(1.0f, 0.49f, 0.0f),
       Color(0.0, 0.0, 0.0) );
 
   tOut = 0;

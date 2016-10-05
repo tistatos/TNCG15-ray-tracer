@@ -2,7 +2,7 @@
 * @file camera.cpp
 * @author Erik Sandrén
 * @date 05-09-2016
-* @brief [Description Goes Here]
+* @brief Camera to cast rays from
 */
 
 #include "camera.h"
@@ -13,66 +13,32 @@
 #include <iostream>
 #include <cmath>
 
-void savePPM(const char* fileName, Pixel* p, double maxR, double maxG, double maxB) {
-  FILE *f = fopen(fileName, "w");
-  fprintf(f, "P3\n%d %d\n%d\n", CAMERA_RESOLUTION, CAMERA_RESOLUTION, 255);
-
-  for (unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i) {
-    fprintf(f, "%d %d %d ",
-        int(p[i].color.r * 255.99/ maxR),
-        int(p[i].color.g * 255.99 / maxG),
-        int(p[i].color.b * 255.99 / maxB));
-  }
-  fclose(f);
-}
-
-Camera::Camera(Vertex leftEye, Vertex rightEye)
-  : mLeftEye(leftEye), mRightEye(rightEye) {
-    mPixels = new Pixel[CAMERA_RESOLUTION*CAMERA_RESOLUTION];
+Camera::Camera(glm::vec3 position, int width, int height, glm::mat4 perspective)
+  : mPosition(position),
+   mWidth(width),
+   mHeight(height) {
+    glm::mat4 view = glm::lookAt(position, glm::vec3(1.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,1.0f));
+    mInverseViewPerspective = glm::inverse(perspective*view);
 }
 
 
-Camera::~Camera() {
-  for(unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i)
-    delete mPixels[i].ray;
-  delete[] mPixels;
+Ray Camera::castRay(float x, float y) {
+  float xNDC = (2.0f * x) / mWidth - 1.0f;
+  float yNDC = 1.0f - (2.0f * y) / mHeight;
+  float zNDC = 1.0f;
+
+  glm::vec4 end = mInverseViewPerspective * glm::vec4(xNDC, yNDC, zNDC, 1.0f);
+  end = glm::normalize(end);
+
+  glm::vec3 rayEnd(end.x, end.y, end.z);
+
+  Ray r(mPosition, rayEnd, Color());
+  return r;
 }
 
-void Camera::render(Scene* scene) {
-  std::vector<SceneObject*> sceneObjects = scene->getObjects();
-  for(unsigned int y = 0; y < CAMERA_RESOLUTION; ++y) {
-    for(unsigned int x = 0; x < CAMERA_RESOLUTION; ++x) {
-      //TODO: Implement random supersampling
-      Pixel p = mPixels[x+CAMERA_RESOLUTION*y];
-
-      Ray* r = new Ray(
-            mRightEye,
-            Vertex(-0.9f, 0.999-x*0.002, 0.999-y*0.002),
-            Color(1.0, 1.0, 1.0));
-
-      p.ray = r;
-      std::vector<SceneObject*>::iterator it = sceneObjects.begin();
-      float tCurrent = FLT_MAX;
-      for(; it != sceneObjects.end(); it++) {
-        float tOut = 0.0f;
-        if((*it)->rayIntersection(p.ray, tOut) && tOut < tCurrent) {
-          tCurrent = tOut;
-          p.setColor(
-              (*it)->getColor());
-        }
-      }
-      mPixels[x+CAMERA_RESOLUTION*y] = p;
-    }
-  }
-}
-
-void Camera::createImage(const char* fileName) {
-  double maxR = 0.0, maxG = 0.0, maxB = 0.0;
-  for(unsigned int i = 0; i < CAMERA_RESOLUTION*CAMERA_RESOLUTION; ++i) {
-    maxR = std::max(maxR, mPixels[i].color.r);
-    maxG = std::max(maxG, mPixels[i].color.g);
-    maxB = std::max(maxB, mPixels[i].color.b);
-  }
-
-  savePPM(fileName, mPixels, maxR, maxG, maxB);
-}
+//void Camera::render(Scene* scene) {
+  //Ray* r = new Ray(
+    //mRightEye,
+    //glm::vec3(-0.9f, 0.999-x*0.002, 0.999-y*0.002),
+    //Color(1.0, 1.0, 1.0));
+//}

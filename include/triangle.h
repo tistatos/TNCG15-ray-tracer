@@ -8,6 +8,8 @@
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
 
+#include <glm/glm.hpp>
+
 #include "ray.h"
 #include "color.h"
 #include "intersectable.h"
@@ -16,11 +18,11 @@ class Triangle : public Intersectable {
 public:
   Triangle();
   ~Triangle();
-  Triangle(Vertex v0, Vertex v1, Vertex v2);
+  Triangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2);
   bool rayIntersection(Ray* r, float &tOut);
 
 private:
-  Vertex mV0, mV1, mV2;
+  glm::vec3 mV0, mV1, mV2;
   glm::vec3 mNormal;
 };
 

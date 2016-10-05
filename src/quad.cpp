@@ -6,10 +6,9 @@
 */
 
 #include "quad.h"
-#include "vertex.h"
 #include "color.h"
 
-Quad::Quad(Vertex topRight, Vertex topLeft, Vertex bottomLeft, Vertex bottomRight, Surface* surface) {
+Quad::Quad(glm::vec3 topRight, glm::vec3 topLeft, glm::vec3 bottomLeft, glm::vec3 bottomRight, Surface* surface) {
   mTriangles = new Triangle[2];
   this->surface = surface;
 

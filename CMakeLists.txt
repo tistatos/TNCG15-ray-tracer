@@ -22,9 +22,10 @@ if( CMAKE_BINARY_DIR MATCHES " " )
   message( "Your Build Directory contains spaces. If you experience problems when compiling, this can be the cause." )
 endif()
 
+find_package(OpenMP)
 
 #compiler flags
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-std=c++11 ${OpenMP_CXX_FLAGS}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 add_definitions(

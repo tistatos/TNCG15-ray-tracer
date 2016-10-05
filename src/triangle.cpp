@@ -10,7 +10,7 @@
 
 Triangle::Triangle() { }
 
-Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2) :
+Triangle::Triangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2) :
   mV0(v0), mV1(v1), mV2(v2) {
     mNormal = glm::normalize(glm::cross(v1-v2, v0-v2));
 }
@@ -20,13 +20,13 @@ Triangle::~Triangle() {
 }
 
 bool Triangle::rayIntersection(Ray* r, float &tOut) {
-  Vertex T = r->start - mV0;
-  Vertex E1 = mV1 - mV0;
-  Vertex E2 = mV2 - mV0;
-  Vertex D = r->end - r->start;
+  glm::vec3 T = r->start - mV0;
+  glm::vec3 E1 = mV1 - mV0;
+  glm::vec3 E2 = mV2 - mV0;
+  glm::vec3 D = r->direction;
 
-  Vertex P = glm::cross(D, E2);
-  Vertex Q = glm::cross(T, E1);
+  glm::vec3 P = glm::cross(D, E2);
+  glm::vec3 Q = glm::cross(T, E1);
 
   float det = glm::dot(P, E1);
 

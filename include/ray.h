@@ -8,7 +8,8 @@
 #ifndef __RAY_H__
 #define __RAY_H__
 
-#include "vertex.h"
+#include <glm/glm.hpp>
+
 #include "color.h"
 #include "triangle.h"
 #include "intersectable.h"
@@ -17,19 +18,20 @@ class Intersectable;
 
 class Ray {
 public:
-  Ray(Vertex start, Vertex end, Color c);
+  Ray(glm::vec3 start, glm::vec3 direction, Color c);
 
   void setIntersection(Intersectable* intersect);
   float length();
   void normalize();
+  Ray reflect();
 
-  Vertex start, end;
+public:
+  glm::vec3 start, direction;
   Color color;
   float importance = 1.0f;
 
 private:
   Intersectable* mIntersect;
 };
-
 
 #endif

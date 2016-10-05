@@ -8,10 +8,11 @@
 #ifndef __SURFACE_H__
 #define __SURFACE_H__
 
+#include "ray.h"
 #include "color.h"
-#include "vertex.h"
 #include "glm/glm.hpp"
 
+class Ray;
 class Surface {
 public:
   enum eReflectionType {
@@ -23,10 +24,10 @@ public:
   Surface();
   Surface(Color c);
   Surface(Color c, eReflectionType rType);
-  Surface(Color c, Vertex emission);
-
+  Surface(Color c, glm::vec3 emission);
 
   Color color;
+  bool reflect(Ray& in, Ray& reflect, Ray& refract);
 
 private:
   const float glassRefract = 1.5f;

@@ -7,8 +7,8 @@
 
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
+#include <glm/gtc/matrix_transform.hpp>
 
-#include "vertex.h"
 #include "pixel.h"
 #include "scene.h"
 
@@ -16,16 +16,14 @@ const int CAMERA_RESOLUTION = 1000;
 
 class Camera {
 public:
-  Camera(Vertex leftEye, Vertex rightEye);
-  ~Camera();
-
-  void render(Scene* scene);
-  void createImage(const char* fileName);
+  Camera(glm::vec3 position, int width, int height, glm::mat4  perspective);
+  Ray castRay(float x, float y);
 
 private:
-  Vertex mLeftEye;
-  Vertex mRightEye;
-  Pixel* mPixels;
+  glm::vec3 mPosition;
+  glm::mat4 mInverseViewPerspective;
+  int mWidth;
+  int mHeight;
 };
 
 

@@ -8,7 +8,7 @@
 #include "sphere.h"
 #include <cmath>
 
-Sphere::Sphere(float radius, Vertex position, Surface* surface) :
+Sphere::Sphere(float radius, glm::vec3 position, Surface* surface) :
   mPosition(position), mRadius(radius) {
     this->surface = surface;
 }
@@ -19,11 +19,11 @@ Sphere::~Sphere() {
 
 bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   glm::vec3 o = ray->start;
-  glm::vec3 i = ray->end;
+  glm::vec3 i = ray->direction;
   glm::vec3 c = mPosition;
   float r = mRadius;
 
-  float b = glm::dot(2*i, o-c);
+  float b = glm::dot(i * 2.0f, o-c);
   float cCoeff = glm::dot(o-c,o-c) - r;
 
   float d1 = -b/2.0f;

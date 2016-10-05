@@ -6,101 +6,107 @@
 */
 
 #include "scene.h"
-#include "vertex.h"
 #include "color.h"
 #include "quad.h"
 #include "sphere.h"
 
 Scene::Scene() {
+  mObjects.push_back(
+      new Sphere(3.0f,glm::vec3(8.0f, 0.0f, 0.0f),
+        new Surface(Color(0.0,1.0, 1.0)) )
+      );
   //Floor
   mObjects.push_back(
       new Quad(
-        Vertex(10.0f, 6.0f, -5.0f),
-        Vertex(0.0f, 6.0f, -5.0f),
-        Vertex(-3.0f, 0.0f, -5.0f),
-        Vertex(13.0f, 0.0f, -5.0f),
-        new Surface(Color(0.4, 0.4, 0.4)) ) );
+        glm::vec3(10.0f, 6.0f, -5.0f),
+        glm::vec3(0.0f, 6.0f, -5.0f),
+        glm::vec3(-3.0f, 0.0f, -5.0f),
+        glm::vec3(13.0f, 0.0f, -5.0f),
+        new Surface(Color(0.8, 0.8, 0.8)) ) );
 
   mObjects.push_back(
       new Quad(
-        Vertex(13.0f, 0.0f, -5.0f),
-        Vertex(-3.0f, 0.0f, -5.0f),
-        Vertex(0.0f, -6.0f, -5.0f),
-        Vertex(10.0f, -6.0f, -5.0f),
-        new Surface(Color(0.4, 0.4, 0.4)) ) );
+        glm::vec3(13.0f, 0.0f, -5.0f),
+        glm::vec3(-3.0f, 0.0f, -5.0f),
+        glm::vec3(0.0f, -6.0f, -5.0f),
+        glm::vec3(10.0f, -6.0f, -5.0f),
+        new Surface(Color(0.8, 0.8, 0.8)) ) );
 
   //Ceiling
   mObjects.push_back(
       new Quad(
-        Vertex(10.0f, 6.0f, 5.0f),
-        Vertex(0.0f, 6.0f, 5.0f),
-        Vertex(-3.0f, 0.0f, 5.0f),
-        Vertex(13.0f, 0.0f, 5.0f),
+        glm::vec3(10.0f, 6.0f, 5.0f),
+        glm::vec3(0.0f, 6.0f, 5.0f),
+        glm::vec3(-3.0f, 0.0f, 5.0f),
+        glm::vec3(13.0f, 0.0f, 5.0f),
         new Surface(Color(0.4, 0.4, 0.4)) ) );
   mObjects.push_back(
       new Quad(
-        Vertex(13.0f, 0.0f, 5.0f),
-        Vertex(-3.0f, 0.0f, 5.0f),
-        Vertex(0.0f, -6.0f, 5.0f),
-        Vertex(10.0f, -6.0f, 5.0f),
+        glm::vec3(13.0f, 0.0f, 5.0f),
+        glm::vec3(-3.0f, 0.0f, 5.0f),
+        glm::vec3(0.0f, -6.0f, 5.0f),
+        glm::vec3(10.0f, -6.0f, 5.0f),
         new Surface(Color(0.4, 0.4, 0.4)) ) );
-  ////Walls
-  mObjects.push_back(
-      new Quad(
-        Vertex(0.0f, 6.0f, 5.0f),
-        Vertex(-3.0f, 0.0f, 5.0f),
-        Vertex(-3.0f, 0.0f, -5.0f),
-        Vertex(0.0f, 6.0f,-5.0f),
-        new Surface(Color(1.0, 0.0, 0.0)) ) );
 
+  //Walls
+  /**    2
+   *     __
+   * 1 /    \ 3
+   * 6 \ __ / 4
+   *     5
+   */
   mObjects.push_back(
       new Quad(
-        Vertex(10.0f, 6.0f, 5.0f),
-        Vertex(0.0f, 6.0f, 5.0f),
-        Vertex(0.0f, 6.0f, -5.0f),
-        Vertex(10.0f, 6.0f,-5.0f),
+        glm::vec3(0.0f, 6.0f, 5.0f),
+        glm::vec3(-3.0f, 0.0f, 5.0f),
+        glm::vec3(-3.0f, 0.0f, -5.0f),
+        glm::vec3(0.0f, 6.0f,-5.0f),
         new Surface(Color(0.0, 1.0, 0.0)) ) );
 
   mObjects.push_back(
       new Quad(
-        Vertex(13.0f, 0.0f, 5.0f),
-        Vertex(10.0f, 6.0f, 5.0f),
-        Vertex(10.0f, 6.0f, -5.0f),
-        Vertex(13.0f, 0.0f,-5.0f),
+        glm::vec3(10.0f, 6.0f, 5.0f),
+        glm::vec3(0.0f, 6.0f, 5.0f),
+        glm::vec3(0.0f, 6.0f, -5.0f),
+        glm::vec3(10.0f, 6.0f,-5.0f),
+        new Surface(Color(1.0, 0.0, 0.0)) ) );
+
+  mObjects.push_back(
+      new Quad(
+        glm::vec3(13.0f, 0.0f, 5.0f),
+        glm::vec3(10.0f, 6.0f, 5.0f),
+        glm::vec3(10.0f, 6.0f, -5.0f),
+        glm::vec3(13.0f, 0.0f,-5.0f),
+        new Surface(Color(0.0, 1.0, 0.0)) ) );
+
+  mObjects.push_back(
+      new Quad(
+        glm::vec3(10.0f, -6.0f, 5.0f),
+        glm::vec3(13.0f, 0.0f, 5.0f),
+        glm::vec3(13.0f, 0.0f, -5.0f),
+        glm::vec3(10.0f, -6.0f,-5.0f),
         new Surface(Color(0.0, 0.0, 1.0)) ) );
 
   mObjects.push_back(
       new Quad(
-        Vertex(10.0f, -6.0f, 5.0f),
-        Vertex(13.0f, 0.0f, 5.0f),
-        Vertex(13.0f, 0.0f, -5.0f),
-        Vertex(10.0f, -6.0f,-5.0f),
-        new Surface(Color(0.0, 1.0, 1.0)) ) );
+        glm::vec3(0.0f, -6.0f, 5.0f),
+        glm::vec3(10.0f, -6.0f, 5.0f),
+        glm::vec3(10.0f, -6.0f, -5.0f),
+        glm::vec3(0.0f, -6.0f,-5.0f),
+        new Surface(Color(0.0, 1.0, 0.0)) ) );
 
   mObjects.push_back(
       new Quad(
-        Vertex(0.0f, -6.0f, 5.0f),
-        Vertex(10.0f, -6.0f, 5.0f),
-        Vertex(10.0f, -6.0f, -5.0f),
-        Vertex(0.0f, -6.0f,-5.0f),
-        new Surface(Color(1.0, 1.0, 0.0)) ) );
-
-  mObjects.push_back(
-      new Quad(
-        Vertex(-3.0f, 0.0f, 5.0f),
-        Vertex(0.0f, -6.0f, 5.0f),
-        Vertex(0.0f, -6.0f, -5.0f),
-        Vertex(-3.0f, 0.0f,-5.0f),
+        glm::vec3(-3.0f, 0.0f, 5.0f),
+        glm::vec3(0.0f, -6.0f, 5.0f),
+        glm::vec3(0.0f, -6.0f, -5.0f),
+        glm::vec3(-3.0f, 0.0f,-5.0f),
         new Surface(Color(1.0, 0.0, 1.0)) ) );
 
-  mObjects.push_back(
-      new Sphere(5.0f,Vertex(3.0f, 0.0f, 0.0f),
-        new Surface(Color(1.0,1.0, 0)) )
 
-      );
   mObjects.push_back(
-      new Sphere(4.0f,Vertex(3.0f, 0.0f, 7.0f),
-        new Surface(Color(1.0,1.0, 1.0), Vertex(1.0f, 1.0f, 1.0f) ) )
+      new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 7.7f),
+        new Surface(Color(1.0,1.0, 1.0), glm::vec3(1.0f, 1.0f, 1.0f) ) )
       );
 }
 

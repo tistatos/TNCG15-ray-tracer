@@ -12,12 +12,12 @@
 
 class Sphere : public SceneObject {
 public:
-  Sphere(float radius, Vertex position, Surface* s);
+  Sphere(float radius, glm::vec3 position, Surface* s);
   ~Sphere();
   bool rayIntersection(Ray* r, float &tOut);
 
 private:
-  Vertex mPosition;
+  glm::vec3 mPosition;
   float mRadius;
 };
 
