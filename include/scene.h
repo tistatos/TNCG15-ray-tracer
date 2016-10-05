@@ -11,14 +11,13 @@
 #include "sceneObject.h"
 #include <vector>
 
-#define SceneIterator std::vector<SceneObject*>::iterator
+#define SceneIterator std::vector<SceneObject*>::const_iterator
 
 class Scene {
 public:
   Scene();
   ~Scene();
-  void addObject(SceneObject* object);
-  std::vector<SceneObject*> getObjects();
+  bool intersect(Ray &ray, float &tOut, Intersectable* &object) const;
 
 private:
   std::vector<SceneObject*> mObjects;

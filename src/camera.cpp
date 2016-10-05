@@ -32,7 +32,7 @@ Ray Camera::castRay(float x, float y) {
 
   glm::vec3 rayEnd(end.x, end.y, end.z);
 
-  Ray r(mPosition, rayEnd, Color());
+  Ray r(mPosition, rayEnd);
   return r;
 }
 

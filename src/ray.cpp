@@ -7,8 +7,12 @@
 
 #include "ray.h"
 
-Ray::Ray(glm::vec3 start, glm::vec3 direction, Color color) : start(start), direction(direction), color(color) {
+Ray::Ray(glm::vec3 start, glm::vec3 direction) : start(start), direction(direction) {
   this->normalize();
+}
+
+Ray::Ray(glm::vec3 start, glm::vec3 direction, Color color) : Ray(start, direction) {
+  this->color = color;
 }
 
 void Ray::normalize() {

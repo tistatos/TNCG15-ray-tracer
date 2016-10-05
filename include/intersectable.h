@@ -20,7 +20,11 @@ class Intersectable {
 public:
   virtual ~Intersectable() { }
   virtual bool rayIntersection(Ray* r, float &tOut) = 0;
+  virtual glm::vec3 getNormal(glm::vec3 position) { return mNormal; }
+public:
   Surface* surface;
+protected:
+  glm::vec3 mNormal;
 };
 
 

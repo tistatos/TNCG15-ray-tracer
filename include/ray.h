@@ -18,6 +18,7 @@ class Intersectable;
 
 class Ray {
 public:
+  Ray(glm::vec3 start, glm::vec3 direction);
   Ray(glm::vec3 start, glm::vec3 direction, Color c);
 
   void setIntersection(Intersectable* intersect);

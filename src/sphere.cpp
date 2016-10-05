@@ -16,6 +16,9 @@ Sphere::Sphere(float radius, glm::vec3 position, Surface* surface) :
 Sphere::~Sphere() {
   delete surface;
 }
+glm::vec3 Sphere::getNormal(glm::vec3 position) {
+  return glm::normalize(position-mPosition);
+}
 
 bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   glm::vec3 o = ray->start;

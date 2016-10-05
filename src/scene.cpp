@@ -14,7 +14,8 @@ Scene::Scene() {
   mObjects.push_back(
       new Sphere(3.0f,glm::vec3(8.0f, 0.0f, 0.0f),
         new Surface(Color(0.0,1.0, 1.0)) )
-      );
+  );
+
   //Floor
   mObjects.push_back(
       new Quad(
@@ -106,7 +107,7 @@ Scene::Scene() {
 
   mObjects.push_back(
       new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 7.7f),
-        new Surface(Color(1.0,1.0, 1.0), glm::vec3(1.0f, 1.0f, 1.0f) ) )
+        new Surface(Color(1.0,1.0, 1.0), Color(1.0f, 1.0f, 1.0f)) )
       );
 }
 
@@ -115,6 +116,16 @@ Scene::~Scene() {
     delete mObjects[i];
   mObjects.clear();
 }
-std::vector<SceneObject*> Scene::getObjects() {
-  return mObjects;
+
+bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object) const {
+  SceneIterator it = mObjects.begin();
+  tOut = FLT_MAX;
+  float tCurrent = FLT_MAX;
+  for(; it < mObjects.end(); it++) {
+    if((*it)->rayIntersection(&ray, tCurrent) && tCurrent < tOut) {
+      tOut = tCurrent;
+      object = (*it);
+    }
+  }
+  return tOut < FLT_MAX;
 }

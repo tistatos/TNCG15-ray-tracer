@@ -26,6 +26,4 @@ private:
   glm::vec3 mNormal;
 };
 
-
-
 #endif

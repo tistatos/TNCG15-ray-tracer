@@ -24,15 +24,15 @@ public:
   Surface();
   Surface(Color c);
   Surface(Color c, eReflectionType rType);
-  Surface(Color c, glm::vec3 emission);
+  Surface(Color c, Color emission);
 
   Color color;
+  Color emission;
   bool reflect(Ray& in, Ray& reflect, Ray& refract);
 
 private:
   const float glassRefract = 1.5f;
   eReflectionType mReflectionType;
-  glm::vec3 mEmission;
 };
 
 

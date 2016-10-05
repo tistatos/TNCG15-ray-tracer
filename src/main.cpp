@@ -13,8 +13,9 @@
 #include "camera.h"
 #include "pixel.h"
 
-#define WIDTH 1000
-#define HEIGHT 1000
+#define WIDTH 512
+#define HEIGHT 512
+#define SUB_PIXEL_SAMPLES 1
 
 void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double maxG, double maxB) {
   FILE *f = fopen(fileName, "w");
@@ -39,21 +40,38 @@ int main() {
 
   Scene scene;
 
-  std::vector<SceneObject*> objects = scene.getObjects();
   double begin = omp_get_wtime();
 
   #pragma omp parallel for collapse(2)
   for (unsigned int y = 0; y < HEIGHT; ++y) {
     for (unsigned int x = 0; x < WIDTH; ++x) {
-      Pixel &p = pixels[x][y];
-      SceneIterator it = objects.begin();
-      Ray ray = camera.castRay(x,y);
-      float tCurrent = FLT_MAX;
-      for(; it != objects.end(); it++) {
-        float tOut = 0.0f;
-        if((*it)->rayIntersection(&ray, tOut) && tOut < tCurrent) {
-          tCurrent = tOut;
-          p.setColor((*it)->getColor());
+      for(unsigned int s = 0; s < SUB_PIXEL_SAMPLES; ++s) {
+        Pixel &p = pixels[x][y];
+        Ray ray = camera.castRay(x,y);
+
+        float t = 0.0f;
+        Intersectable* intersect;
+        if(scene.intersect(ray, t, intersect)) {
+          Color e = intersect->surface->emission;
+          if(e.r != 0 && e.g != 0 && e.r != 0) {
+            //Hit light
+            p.setColor(intersect->surface->color);
+            continue;
+          }
+
+          glm::vec3 intersectionPoint = ray.start + ray.direction * (0.999f * t);
+          Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f)-intersectionPoint);
+
+          Intersectable* light;
+          if(scene.intersect(shadowRay, t, light)) {
+            e = light->surface->emission;
+            if(e.r == 0 && e.g == 0 && e.r == 0) {
+              p.setColor(Color(0.0, 0.0, 0.0));
+            }
+            else {
+              p.setColor(intersect->surface->color);
+            }
+          }
         }
       }
     }

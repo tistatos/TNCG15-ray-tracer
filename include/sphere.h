@@ -15,6 +15,7 @@ public:
   Sphere(float radius, glm::vec3 position, Surface* s);
   ~Sphere();
   bool rayIntersection(Ray* r, float &tOut);
+  glm::vec3 getNormal(glm::vec3 position);
 
 private:
   glm::vec3 mPosition;
