@@ -69,9 +69,8 @@ int main() {
           }
           else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
               glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
-              Ray reflectRay(intersectionPoint, reflected);
-
-              if(scene.intersect(reflectRay, t, intersect)) {
+              ray = Ray(intersectionPoint, reflected);
+              if(scene.intersect(ray, t, intersect)) {
                 p.setColor(intersect->surface->color);
                 continue;
               }

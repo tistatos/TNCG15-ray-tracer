@@ -18,7 +18,7 @@ Scene::Scene() {
 
   mObjects.push_back(
       new Sphere(2.0f,glm::vec3(8.0f, 2.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
+        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
   );
 
   //Floor
@@ -67,7 +67,7 @@ Scene::Scene() {
         glm::vec3(-3.0f, 0.0f, 5.0f),
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(0.0f, 6.0f,-5.0f),
-        new Surface(Color(0.0, 1.0, 0.0)) ) );
+        new Surface(Color(1.0, 1.0, 0.0)) ) );
 
   mObjects.push_back(
       new Quad(
