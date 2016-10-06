@@ -54,11 +54,11 @@ int main() {
         Intersectable* intersect;
         Color color;
 
-        while(depth < 1) {
+        while(depth < 2) {
           if(scene.intersect(ray, t, intersect)) {
             glm::vec3 intersectionPoint = ray.start + ray.direction * t * 0.99f;
             glm::vec3 normal = intersect->getNormal(intersectionPoint);
-            normal = glm::dot(normal, ray.direction) > 0 ? normal : -normal;
+            glm::vec3 normalL = glm::dot(normal, ray.direction) > 0 ? normal : -normal;
 
             Surface* surface = intersect->surface;
             Color sColor = surface->color;
@@ -69,26 +69,28 @@ int main() {
               if(scene.intersect(shadowRay, t, light)) {
                 Color e = light->surface->emission;
                 if(e.r != 0 && e.g != 0 && e.r != 0) {
-                  color = sColor;
+                  Color lightContrb = e * glm::dot(normalL, ray.direction);
+                  color = surface->emission + sColor * lightContrb;
                 }
               }
               depth++;
-              continue;
+              break; //FIXME: terminates on diffuse
             }
             else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
                 glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
                 ray = Ray(intersectionPoint, reflected);
-                //depth++;
+                depth++;
                 continue;
             }
             else if(surface->reflectionType == Surface::eReflectionType::kRefraction) {
-                //glm::vec3 refracted = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
-                //Ray refractedRay(intersectionPoint, refracted);
+              glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
+              Ray reflectRay = Ray(intersectionPoint, reflected);
 
-                //if(scene.intersect(refractedRay, t, intersect)) {
-                  //p.setColor(intersect->surface->color);
-                  //continue;
-                //}
+              bool goingIn = glm::dot(normal, normalL) > 0;
+              float refIndex = 1.5;
+              if(goingIn) refIndex = 1/1.5;
+
+
             }
 
             //Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f)-intersectionPoint);

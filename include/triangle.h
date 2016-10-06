@@ -23,7 +23,6 @@ public:
 
 private:
   glm::vec3 mV0, mV1, mV2;
-  glm::vec3 mNormal;
 };
 
 #endif

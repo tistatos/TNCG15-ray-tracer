@@ -15,6 +15,7 @@ public:
   Quad(glm::vec3 topLeft, glm::vec3 topRight, glm::vec3 bottomLeft, glm::vec3 bottomRight, Surface* surface);
   ~Quad();
 
+  glm::vec3 getNormal(glm::vec3 position);
   bool rayIntersection(Ray* r, float &tOut);
 };
 

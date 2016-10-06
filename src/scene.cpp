@@ -107,7 +107,7 @@ Scene::Scene() {
         glm::vec3(0.0f, -6.0f, 5.0f),
         glm::vec3(0.0f, -6.0f, -5.0f),
         glm::vec3(-3.0f, 0.0f,-5.0f),
-        new Surface(Color(1.0, 0.0, 1.0)) ) );
+        new Surface(Color(0.0, 1.0, 1.0)) ) );
 
 
   mObjects.push_back(

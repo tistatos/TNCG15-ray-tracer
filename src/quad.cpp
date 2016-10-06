@@ -25,3 +25,7 @@ bool Quad::rayIntersection(Ray* r, float &tOut) {
 
   return intersects;
 }
+
+glm::vec3 Quad::getNormal(glm::vec3 position) {
+  return mTriangles[0].getNormal(position);
+}

@@ -12,7 +12,7 @@ Triangle::Triangle() { }
 
 Triangle::Triangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2) :
   mV0(v0), mV1(v1), mV2(v2) {
-    mNormal = glm::normalize(glm::cross(v1-v2, v0-v2));
+    mNormal = glm::normalize(glm::cross(v0-v2, v1-v2));
 }
 
 Triangle::~Triangle() {
