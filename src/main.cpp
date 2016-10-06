@@ -59,18 +59,20 @@ int main() {
             continue;
           }
 
-          glm::vec3 intersectionPoint = ray.start + ray.direction * (0.999f * t);
+          glm::vec3 intersectionPoint = ray.start + ray.direction * t * 0.99f;
           Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f)-intersectionPoint);
 
           Intersectable* light;
           if(scene.intersect(shadowRay, t, light)) {
             e = light->surface->emission;
             if(e.r == 0 && e.g == 0 && e.r == 0) {
-              p.setColor(Color(0.0, 0.0, 0.0));
+              //p.setColor(light->surface->color);
             }
             else {
               p.setColor(intersect->surface->color);
             }
+            if(t < 0)
+              std::cout << "negative t:"  << t << std::endl;
           }
         }
       }

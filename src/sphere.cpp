@@ -7,6 +7,7 @@
 
 #include "sphere.h"
 #include <cmath>
+#include <iostream>
 
 Sphere::Sphere(float radius, glm::vec3 position, Surface* surface) :
   mPosition(position), mRadius(radius) {
@@ -42,16 +43,13 @@ bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   d1 += dSqrt;
   d2 -= dSqrt;
 
-  if(d1 < d2) {
+  if(d1 < d2 && d1 > 0) {
     tOut = d1;
     return true;
   }
-  else if(d2 < d1) {
+  else if(d2 < d1 && d2 > 0) {
     tOut = d2;
     return true;
   }
-  else {
-    tOut = d1;
-    return true;
-  }
+  return false;
 }
