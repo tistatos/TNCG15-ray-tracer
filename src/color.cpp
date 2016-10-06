@@ -9,3 +9,11 @@
 
 Color::Color() : Color(0.0, 0.0, 0.0) { }
 Color::Color(double r, double g, double b) : r(r), g(g), b(b) { }
+
+Color Color::operator+(const Color b) {
+  return Color(this->r + b.r, this->g + b.g, this->b + b.b);
+}
+
+Color Color::operator*(const Color b) {
+  return Color(this->r * b.r, this->g * b.g, this->b * b.b);
+}

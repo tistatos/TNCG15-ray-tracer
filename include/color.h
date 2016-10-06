@@ -13,6 +13,8 @@ public:
   Color();
   Color(double r, double g, double b);
   double r, g, b;
+  Color operator+(const Color b);
+  Color operator*(const Color b);
 };
 
 
