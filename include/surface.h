@@ -28,11 +28,9 @@ public:
 
   Color color;
   Color emission;
-  bool reflect(Ray& in, Ray& reflect, Ray& refract);
 
-private:
   const float glassRefract = 1.5f;
-  eReflectionType mReflectionType;
+  eReflectionType reflectionType;
 };
 
 
