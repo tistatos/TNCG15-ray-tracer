@@ -50,3 +50,17 @@ TEST(triangle, Intersection) {
 
   ASSERT_FALSE(intersected) << "intersection not expected";
 }
+
+TEST(triangle, normal) {
+  Triangle t(
+      glm::vec3(10.0f, 6.0f, 5.0f),
+      glm::vec3(0.0f, 6.0f, 5.0f),
+      glm::vec3(10.0f, 6.0f, -5.0f));
+
+  glm::vec3 normal = t.getNormal(glm::vec3());
+
+
+  EXPECT_FLOAT_EQ(normal.x, 0.0f) << "Normal of triangle should only have y part";
+  EXPECT_FLOAT_EQ(normal.y, -1.0f) << "Normal of triangle should only have y part";
+  EXPECT_FLOAT_EQ(normal.z, 0.0f) << "Normal of triangle should only have y part";
+}

@@ -25,29 +25,34 @@ bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   glm::vec3 o = ray->start;
   glm::vec3 i = ray->direction;
   glm::vec3 c = mPosition;
+  glm::vec3 oc = o - c;
   float r = mRadius;
 
-  float b = glm::dot(i * 2.0f, o-c);
-  float cCoeff = glm::dot(o-c,o-c) - r*r;
+  float b = glm::dot(i * 2.0f, oc);
 
   float d1 = -b/2.0f;
   float d2 = d1;
 
-  float delta = d1*d1 - cCoeff;
-  if(delta < 0) {
+  float delta = d1*d1 - (glm::dot(oc, oc) - r*r);
+  if(delta < -EPSILON) {
     return false; // complex solutions
+  }
+  else if( delta > -EPSILON && delta < EPSILON) {
+    tOut = d1;
+    return true;
   }
 
   float dSqrt = std::sqrt(delta);
 
-  d1 += dSqrt;
-  d2 -= dSqrt;
+  d1 -= dSqrt;
+  d2 += dSqrt;
 
-  if(d1 <= d2 && d1 > 0) {
+  if(d1 >= 0 ) {
     tOut = d1;
     return true;
   }
-  else if(d2 <= d1 && d2 > 0) {
+
+  else if(d2 >= 0) {
     tOut = d2;
     return true;
   }

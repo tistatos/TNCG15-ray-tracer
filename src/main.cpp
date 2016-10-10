@@ -44,7 +44,7 @@ int main() {
 
   double begin = omp_get_wtime();
 
-  //#pragma omp parallel for collapse(2)
+  #pragma omp parallel for collapse(2)
   for (unsigned int y = 0; y < HEIGHT; ++y) {
     for (unsigned int x = 0; x < WIDTH; ++x) {
       for(unsigned int s = 0; s < SUB_PIXEL_SAMPLES; ++s) {

@@ -23,10 +23,10 @@ Scene::Scene() {
         new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
   );
 
-  //mObjects.push_back(
-      //new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
-        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
-  //);
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
+        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+  );
 
   //Floor
   mObjects.push_back(
@@ -148,8 +148,9 @@ Color Scene::trace(Ray ray, unsigned int depth) const {
   Intersectable* intersect;
 
   if(this->intersect(ray, t, intersect)) {
-    glm::vec3 intersectionPoint = ray.start + ray.direction * t * 0.99f;
+    glm::vec3 intersectionPoint = ray.start + ray.direction * t;
     glm::vec3 normal = intersect->getNormal(intersectionPoint);
+    intersectionPoint += normal * EPSILON;
     //normal in same orientation of the ray
     glm::vec3 normalL = glm::dot(normal, ray.direction) < 0 ? normal : -normal;
 
@@ -166,6 +167,7 @@ Color Scene::trace(Ray ray, unsigned int depth) const {
           Color lightContribution = emission * glm::dot(normalL, -ray.direction);
           return surface->emission + sColor * lightContribution;
         }
+        return surface->emission;
       }
     }
     else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
@@ -184,8 +186,6 @@ Color Scene::trace(Ray ray, unsigned int depth) const {
       float refractionIndex = 1.5;
       if(entering) refractionIndex = 1/refractionIndex;
 
-      if(depth > 0)
-        std::cout << refractionIndex << " " << entering << " " << depth << " " << ddn << std::endl;
       float internalReflection = (1 - refractionIndex * refractionIndex * ( 1 - ddn * ddn));
 
       if(internalReflection < 0) {
