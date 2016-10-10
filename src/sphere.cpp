@@ -47,12 +47,12 @@ bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   d1 -= dSqrt;
   d2 += dSqrt;
 
-  if(d1 >= 0 ) {
+  if(d1 > EPSILON ) {
     tOut = d1;
     return true;
   }
 
-  else if(d2 >= 0) {
+  else if(d2 > EPSILON) {
     tOut = d2;
     return true;
   }
