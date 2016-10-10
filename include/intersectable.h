@@ -11,7 +11,7 @@
 #include "ray.h"
 
 //#define EPSILON 0.000001
-#define EPSILON 1e-4f
+#define EPSILON 1e-5f
 
 
 class Ray;
