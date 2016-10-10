@@ -18,7 +18,7 @@ Sphere::~Sphere() {
   delete surface;
 }
 glm::vec3 Sphere::getNormal(glm::vec3 position) {
-  return glm::normalize(position-mPosition);
+  return glm::normalize(position - mPosition);
 }
 
 bool Sphere::rayIntersection(Ray* ray, float &tOut) {
@@ -28,7 +28,7 @@ bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   float r = mRadius;
 
   float b = glm::dot(i * 2.0f, o-c);
-  float cCoeff = glm::dot(o-c,o-c) - r;
+  float cCoeff = glm::dot(o-c,o-c) - r*r;
 
   float d1 = -b/2.0f;
   float d2 = d1;
@@ -43,11 +43,11 @@ bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   d1 += dSqrt;
   d2 -= dSqrt;
 
-  if(d1 < d2 && d1 > 0) {
+  if(d1 <= d2 && d1 > 0) {
     tOut = d1;
     return true;
   }
-  else if(d2 < d1 && d2 > 0) {
+  else if(d2 <= d1 && d2 > 0) {
     tOut = d2;
     return true;
   }
