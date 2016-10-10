@@ -22,7 +22,7 @@ Camera::Camera(glm::vec3 position, int width, int height, glm::mat4 perspective)
 }
 
 
-Ray Camera::castRay(float x, float y) {
+Ray Camera::castRay(float x, float y)  const {
   float xNDC = (2.0f * x) / mWidth - 1.0f;
   float yNDC = 1.0f - (2.0f * y) / mHeight;
   float zNDC = 1.0f;
@@ -35,10 +35,3 @@ Ray Camera::castRay(float x, float y) {
   Ray r(mPosition, rayEnd);
   return r;
 }
-
-//void Camera::render(Scene* scene) {
-  //Ray* r = new Ray(
-    //mRightEye,
-    //glm::vec3(-0.9f, 0.999-x*0.002, 0.999-y*0.002),
-    //Color(1.0, 1.0, 1.0));
-//}
