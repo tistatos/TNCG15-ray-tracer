@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <random>
 
 #include "scene.h"
 #include "color.h"
@@ -142,15 +143,17 @@ bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object) const {
   return tOut < FLT_MAX;
 }
 
-Color Scene::trace(Ray ray, unsigned int depth) const {
+Color Scene::trace(Ray &ray, unsigned int depth) const {
   //FIXME: double instead of float for t?
   float t = 0.0f;
   Intersectable* intersect;
 
   if(this->intersect(ray, t, intersect)) {
+    if(depth == 5) return intersect->surface->emission;
+
     glm::vec3 intersectionPoint = ray.start + ray.direction * t;
     glm::vec3 normal = intersect->getNormal(intersectionPoint);
-    intersectionPoint += normal * EPSILON;
+
     //normal in same orientation of the ray
     glm::vec3 normalL = glm::dot(normal, ray.direction) < 0 ? normal : -normal;
 
@@ -164,7 +167,9 @@ Color Scene::trace(Ray ray, unsigned int depth) const {
       if(this->intersect(shadowRay, t, light)) {
         Color emission = light->surface->emission;
         if(emission.r != 0 && emission.g != 0 && emission.r != 0) {
+
           Color lightContribution = emission * glm::dot(normalL, -ray.direction);
+
           return surface->emission + sColor * lightContribution;
         }
         return surface->emission;
@@ -173,7 +178,9 @@ Color Scene::trace(Ray ray, unsigned int depth) const {
     else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
       //Perfect reflection
       glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
-      return trace(Ray(intersectionPoint, reflected), ++depth);
+      ray.start = intersectionPoint;
+      ray.direction = reflected;
+      return trace(ray, ++depth);
     }
     else if(surface->reflectionType == Surface::eReflectionType::kRefraction) {
       glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
@@ -183,19 +190,32 @@ Color Scene::trace(Ray ray, unsigned int depth) const {
       //FIXME: rename this
       float ddn = glm::dot(normalL, ray.direction);
 
-      float refractionIndex = 1.5;
-      if(entering) refractionIndex = 1/refractionIndex;
+      float n1 = 1.0f;
+      float n2 = 1.5;
+      float refractionIndex = n2;
+      if(entering) refractionIndex = n1/n2;
 
       float internalReflection = (1 - refractionIndex * refractionIndex * ( 1 - ddn * ddn));
 
       if(internalReflection < 0) {
-        return trace(Ray(intersectionPoint, reflected), ++depth);
+        ray.start = intersectionPoint;
+        ray.direction = reflected;
+        return trace(ray, ++depth);
       }
 
-      intersectionPoint = ray.start + ray.direction * t * 1.01f;
+      glm::vec3 refractPoint = ray.start + ray.direction * t;
       glm::vec3 refractionDirection = ray.direction * refractionIndex - normal * (float)((entering ? 1.0 : -1.0f) * (refractionIndex * ddn + sqrt(internalReflection)));
       refractionDirection = glm::normalize(refractionDirection);
-      return trace(Ray(intersectionPoint, refractionDirection), ++depth);
+
+      //Schlick's approximation
+      float R = ((n1 - n2) * (n1 - n2)) / ((n1 + n2) * (n1 + n2));
+      float cosTheta = glm::dot(refractionDirection, normal);
+      float Rs = R + (1 - R) * std::pow((1 - cosTheta), 5);
+
+      Ray reflectedRay = Ray(intersectionPoint, reflected, ray.importance * Rs);
+      Ray refractedRay = Ray(refractPoint, refractionDirection, ray.importance * (1- Rs));
+
+      return trace(refractedRay, ++depth);
     }
   }
   return Color();

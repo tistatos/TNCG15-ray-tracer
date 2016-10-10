@@ -26,6 +26,7 @@ public:
   Surface(Color c, eReflectionType rType);
   Surface(Color c, Color emission);
 
+  Color evaluateBRDF(Ray in, Ray out);
   Color color;
   Color emission;
 

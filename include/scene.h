@@ -18,7 +18,7 @@ public:
   Scene();
   ~Scene();
   bool intersect(Ray &ray, float &tOut, Intersectable* &object) const;
-  Color trace(Ray ray, unsigned int depth) const;
+  Color trace(Ray &ray, unsigned int depth) const;
 
 private:
   std::vector<SceneObject*> mObjects;

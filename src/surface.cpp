@@ -19,3 +19,7 @@ Surface::Surface(Color color, Color emission) {
   this->color = color;
   this->emission = emission;
 }
+
+Color Surface::evaluateBRDF(Ray in, Ray Out) {
+  return this->color * (1.0f / M_PI);
+}

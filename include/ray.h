@@ -28,8 +28,7 @@ public:
 
 public:
   glm::vec3 start, direction;
-  Color color;
-  float importance = 1.0f;
+  Color importance;
 
 private:
   Intersectable* mIntersect;
