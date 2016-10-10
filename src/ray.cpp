@@ -8,11 +8,12 @@
 #include "ray.h"
 
 Ray::Ray(glm::vec3 start, glm::vec3 direction) : start(start), direction(direction) {
+  this->importance = Color(1.0, 1.0, 1.0);
   this->normalize();
 }
 
 Ray::Ray(glm::vec3 start, glm::vec3 direction, Color color) : Ray(start, direction) {
-  this->color = color;
+  this->importance = color;
 }
 
 void Ray::normalize() {
