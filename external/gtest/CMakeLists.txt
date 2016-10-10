@@ -14,6 +14,7 @@ ExternalProject_Add(googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
              -${gtest_CMAKE_ARGS}
+             -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
              -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
              -Dgtest_force_shared_crt=ON
   INSTALL_COMMAND ""
