@@ -17,7 +17,7 @@ class Scene {
 public:
   Scene();
   ~Scene();
-  bool intersect(Ray &ray, float &tOut, Intersectable* &object) const;
+  bool intersect(Ray &ray, float &tOut, Intersectable* &object, bool skipGlas = false) const;
   Color trace(Ray &ray, unsigned int depth) const;
 
 private:

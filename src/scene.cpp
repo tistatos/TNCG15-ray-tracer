@@ -130,12 +130,14 @@ Scene::~Scene() {
   mObjects.clear();
 }
 
-bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object) const {
+bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object, bool skipGlas) const {
   SceneIterator it = mObjects.begin();
   tOut = FLT_MAX;
   float tCurrent = FLT_MAX;
   for(; it < mObjects.end(); it++) {
     if((*it)->rayIntersection(&ray, tCurrent) && tCurrent < tOut) {
+      if(skipGlas && (*it)->surface->reflectionType == Surface::eReflectionType::kRefraction)
+        continue;
       tOut = tCurrent;
       object = (*it);
     }
@@ -158,19 +160,17 @@ Color Scene::trace(Ray &ray, unsigned int depth) const {
     glm::vec3 normalL = glm::dot(normal, ray.direction) < 0 ? normal : -normal;
 
     Surface* surface = intersect->surface;
-    Color sColor = surface->color;
 
     if(surface->reflectionType == Surface::eReflectionType::kDiffuse) {
       //FIXME: hardcoded light vector
       Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
       Intersectable* light;
-      if(this->intersect(shadowRay, t, light)) {
+      if(this->intersect(shadowRay, t, light, true)) {
         Color emission = light->surface->emission;
         if(emission.r != 0 && emission.g != 0 && emission.r != 0) {
-
           Color lightContribution = emission * glm::dot(normalL, -ray.direction);
 
-          return surface->emission + sColor * lightContribution;
+          return surface->emission + surface->color * lightContribution;
         }
         return surface->emission;
       }
@@ -215,6 +215,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) const {
       Ray reflectedRay = Ray(intersectionPoint, reflected, ray.importance * Rs);
       Ray refractedRay = Ray(refractPoint, refractionDirection, ray.importance * (1- Rs));
 
+      //return trace(reflectedRay, ++depth) + trace(refractedRay, ++depth);
       return trace(refractedRay, ++depth);
     }
   }
