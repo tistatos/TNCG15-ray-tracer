@@ -5,6 +5,8 @@
 * @brief [Description Goes Here]
 */
 
+#include <iostream>
+
 #include "scene.h"
 #include "color.h"
 #include "quad.h"
@@ -12,14 +14,19 @@
 
 Scene::Scene() {
   mObjects.push_back(
-      new Sphere(2.0f,glm::vec3(8.0f, 0.0f, 0.0f),
+      new Sphere(1.0f,glm::vec3(8.0f, 0.0f, 0.0f),
         new Surface(Color(0.0,1.0, 1.0)) )
   );
 
   mObjects.push_back(
-      new Sphere(2.0f,glm::vec3(8.0f, 2.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+      new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
+        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
   );
+
+  //mObjects.push_back(
+      //new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
+        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+  //);
 
   //Floor
   mObjects.push_back(
@@ -111,7 +118,7 @@ Scene::Scene() {
 
 
   mObjects.push_back(
-      new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 7.7f),
+      new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 14.9f),
         new Surface(Color(1.0,1.0, 1.0), Color(1.0f, 1.0f, 1.0f)) )
       );
 }
@@ -133,4 +140,63 @@ bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object) const {
     }
   }
   return tOut < FLT_MAX;
+}
+
+Color Scene::trace(Ray ray, unsigned int depth) const {
+  //FIXME: double instead of float for t?
+  float t = 0.0f;
+  Intersectable* intersect;
+
+  if(this->intersect(ray, t, intersect)) {
+    glm::vec3 intersectionPoint = ray.start + ray.direction * t * 0.99f;
+    glm::vec3 normal = intersect->getNormal(intersectionPoint);
+    //normal in same orientation of the ray
+    glm::vec3 normalL = glm::dot(normal, ray.direction) < 0 ? normal : -normal;
+
+    Surface* surface = intersect->surface;
+    Color sColor = surface->color;
+
+    if(surface->reflectionType == Surface::eReflectionType::kDiffuse) {
+      //FIXME: hardcoded light vector
+      Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
+      Intersectable* light;
+      if(this->intersect(shadowRay, t, light)) {
+        Color emission = light->surface->emission;
+        if(emission.r != 0 && emission.g != 0 && emission.r != 0) {
+          Color lightContribution = emission * glm::dot(normalL, -ray.direction);
+          return surface->emission + sColor * lightContribution;
+        }
+      }
+    }
+    else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
+      //Perfect reflection
+      glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
+      return trace(Ray(intersectionPoint, reflected), ++depth);
+    }
+    else if(surface->reflectionType == Surface::eReflectionType::kRefraction) {
+      glm::vec3 reflected = glm::normalize(ray.direction - 2.0f * glm::dot(normal, ray.direction) * normal);
+
+      bool entering = glm::dot(normal, normalL) > 0;
+
+      //FIXME: rename this
+      float ddn = glm::dot(normalL, ray.direction);
+
+      float refractionIndex = 1.5;
+      if(entering) refractionIndex = 1/refractionIndex;
+
+      if(depth > 0)
+        std::cout << refractionIndex << " " << entering << " " << depth << " " << ddn << std::endl;
+      float internalReflection = (1 - refractionIndex * refractionIndex * ( 1 - ddn * ddn));
+
+      if(internalReflection < 0) {
+        return trace(Ray(intersectionPoint, reflected), ++depth);
+      }
+
+      intersectionPoint = ray.start + ray.direction * t * 1.01f;
+      glm::vec3 refractionDirection = ray.direction * refractionIndex - normal * (float)((entering ? 1.0 : -1.0f) * (refractionIndex * ddn + sqrt(internalReflection)));
+      refractionDirection = glm::normalize(refractionDirection);
+      return trace(Ray(intersectionPoint, refractionDirection), ++depth);
+    }
+  }
+  return Color();
 }
