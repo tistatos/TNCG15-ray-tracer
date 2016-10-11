@@ -6,16 +6,15 @@
 */
 
 #include <iostream>
-#include <random>
 
 #include "scene.h"
 #include "color.h"
 #include "quad.h"
 #include "sphere.h"
 
-Scene::Scene() {
+Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(8.0f, 0.0f, 0.0f),
+      new Sphere(1.0f,glm::vec3(7.0f, -1.0f, -2.0f),
         new Surface(Color(0.0,1.0, 1.0)) )
   );
 
@@ -44,7 +43,7 @@ Scene::Scene() {
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(0.0f, -6.0f, -5.0f),
         glm::vec3(10.0f, -6.0f, -5.0f),
-        new Surface(Color(0.8, 0.8, 0.8)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   //Ceiling
   mObjects.push_back(
@@ -145,18 +144,15 @@ bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object, bool skipGl
   return tOut < FLT_MAX;
 }
 
-Color Scene::trace(Ray &ray, unsigned int depth) const {
-  //FIXME: double instead of float for t?
+Color Scene::trace(Ray &ray, unsigned int depth) {
   float t = 0.0f;
   Intersectable* intersect;
 
   if(this->intersect(ray, t, intersect)) {
-    if(depth == 5) return intersect->surface->emission;
+    if(depth >= 5) return intersect->surface->emission;
 
     glm::vec3 intersectionPoint = ray.start + ray.direction * t;
     glm::vec3 normal = intersect->getNormal(intersectionPoint);
-
-    //normal in same orientation of the ray
     glm::vec3 normalL = glm::dot(normal, ray.direction) < 0 ? normal : -normal;
 
     Surface* surface = intersect->surface;
@@ -165,15 +161,18 @@ Color Scene::trace(Ray &ray, unsigned int depth) const {
       //FIXME: hardcoded light vector
       Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
       Intersectable* light;
+      Color lightContribution;
       if(this->intersect(shadowRay, t, light, true)) {
         Color emission = light->surface->emission;
-        if(emission.r != 0 && emission.g != 0 && emission.r != 0) {
-          Color lightContribution = emission * glm::dot(normalL, -ray.direction);
-
-          return surface->emission + surface->color * lightContribution;
-        }
-        return surface->emission;
+        if(emission.r != 0 && emission.g != 0 && emission.r != 0 &&
+            surface->emission.r < 1.0f)
+          lightContribution =  surface->emission + surface->evaluateBRDF(ray, ray) * emission * glm::dot(normalL, -ray.direction);
       }
+      float u1 = rng(engine);
+      float u2 = rng(engine);
+      Ray mcRay = Ray::sampleHemisphere(intersectionPoint, u1, u2);
+      mcRay.importance = ray.importance;
+      return surface->emission + lightContribution + surface->evaluateBRDF(ray, mcRay) * trace(mcRay, ++depth);
     }
     else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
       //Perfect reflection
@@ -187,15 +186,14 @@ Color Scene::trace(Ray &ray, unsigned int depth) const {
 
       bool entering = glm::dot(normal, normalL) > 0;
 
-      //FIXME: rename this
-      float ddn = glm::dot(normalL, ray.direction);
+      float incidence = glm::dot(normalL, ray.direction);
 
       float n1 = 1.0f;
-      float n2 = 1.5;
+      float n2 = 1.5f;
       float refractionIndex = n2;
       if(entering) refractionIndex = n1/n2;
 
-      float internalReflection = (1 - refractionIndex * refractionIndex * ( 1 - ddn * ddn));
+      float internalReflection = (1 - refractionIndex * refractionIndex * ( 1 - incidence * incidence));
 
       if(internalReflection < 0) {
         ray.start = intersectionPoint;
@@ -204,19 +202,22 @@ Color Scene::trace(Ray &ray, unsigned int depth) const {
       }
 
       glm::vec3 refractPoint = ray.start + ray.direction * t;
-      glm::vec3 refractionDirection = ray.direction * refractionIndex - normal * (float)((entering ? 1.0 : -1.0f) * (refractionIndex * ddn + sqrt(internalReflection)));
+      glm::vec3 refractionDirection = ray.direction * refractionIndex - normal * (float)((entering ? 1.0 : -1.0f) * (refractionIndex * incidence + sqrt(internalReflection)));
       refractionDirection = glm::normalize(refractionDirection);
 
       //Schlick's approximation
       float R = ((n1 - n2) * (n1 - n2)) / ((n1 + n2) * (n1 + n2));
-      float cosTheta = glm::dot(refractionDirection, normal);
+      float cosTheta = glm::dot(-ray.direction, normalL);
       float Rs = R + (1 - R) * std::pow((1 - cosTheta), 5);
 
-      Ray reflectedRay = Ray(intersectionPoint, reflected, ray.importance * Rs);
-      Ray refractedRay = Ray(refractPoint, refractionDirection, ray.importance * (1- Rs));
+      //eflectedRay = Ray(intersectionPoint, reflected, ray.importance * Rs);
+      //Ray refraay = Ray(refractPoint, refractionDirection, ray.importance * (1- Rs));
 
-      //return trace(reflectedRay, ++depth) + trace(refractedRay, ++depth);
-      return trace(refractedRay, ++depth);
+      Ray reflectedRay = Ray(intersectionPoint, reflected);
+      Ray refractedRay = Ray(refractPoint, refractionDirection);
+
+      return trace(reflectedRay, depth + 1) * Rs +  trace(refractedRay, depth + 1) * (1-Rs);
+      //return trace(refractedRay, ++depth);
     }
   }
   return Color();

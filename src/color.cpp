@@ -21,3 +21,7 @@ Color Color::operator*(const Color b) {
 Color Color::operator*(const float b) {
   return Color(this->r * b, this->g * b, this->b * b);
 }
+
+Color Color::operator/(const float b) {
+  return Color(this->r / b, this->g / b, this->b / b);
+}

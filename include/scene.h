@@ -10,6 +10,7 @@
 
 #include "sceneObject.h"
 #include <vector>
+#include <random>
 
 #define SceneIterator std::vector<SceneObject*>::const_iterator
 
@@ -18,11 +19,12 @@ public:
   Scene();
   ~Scene();
   bool intersect(Ray &ray, float &tOut, Intersectable* &object, bool skipGlas = false) const;
-  Color trace(Ray &ray, unsigned int depth) const;
+  Color trace(Ray &ray, unsigned int depth);
 
 private:
   std::vector<SceneObject*> mObjects;
-
+  std::mt19937 engine;
+  std::uniform_real_distribution<float> rng;
 };
 
 

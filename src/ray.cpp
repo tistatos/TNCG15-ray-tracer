@@ -16,6 +16,21 @@ Ray::Ray(glm::vec3 start, glm::vec3 direction, Color color) : Ray(start, directi
   this->importance = color;
 }
 
+Ray Ray::sampleHemisphere(glm::vec3 position, float u1, float u2) {
+
+  float r =  sqrt(u1);
+  float theta = 2 * M_PI * u2;
+
+  float x = r * cos(theta);
+  float y = r * sin(theta);
+  float z = sqrt( 1-u1 > 0.0f ? 1 - u1 : 0.0f);
+
+  glm::vec3 direction(x, y, z);
+
+  return Ray(position, glm::normalize(direction));
+
+}
+
 void Ray::normalize() {
   direction = glm::normalize(direction);
 }

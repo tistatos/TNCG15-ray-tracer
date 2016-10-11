@@ -21,6 +21,7 @@ public:
   Ray(glm::vec3 start, glm::vec3 direction);
   Ray(glm::vec3 start, glm::vec3 direction, Color c);
 
+  static Ray sampleHemisphere(glm::vec3 position, float u1, float u2);
   void setIntersection(Intersectable* intersect);
   float length();
   void normalize();
