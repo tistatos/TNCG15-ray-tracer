@@ -27,7 +27,7 @@ Ray Ray::sampleHemisphere(glm::vec3 position, float u1, float u2) {
 
   glm::vec3 direction(x, y, z);
 
-  return Ray(position, glm::normalize(direction));
+  return Ray(position, glm::normalize(direction-position));
 
 }
 
