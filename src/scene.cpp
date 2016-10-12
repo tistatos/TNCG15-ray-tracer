@@ -14,7 +14,7 @@
 
 Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(7.0f, -1.0f, -2.0f),
+      new Sphere(1.0f,glm::vec3(7.0f, -3.0f, -0.0f),
         new Surface(Color(0.0,1.0, 1.0)) )
   );
 
@@ -23,10 +23,10 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
   );
 
-  mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
-  );
+  //mObjects.push_back(
+      //new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
+        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+  //);
 
   //Floor
   mObjects.push_back(
@@ -163,10 +163,12 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       Intersectable* light;
       Color lightContribution;
       if(this->intersect(shadowRay, t, light, true)) {
-        Color emission = light->surface->emission;
-        if( (emission.r != 0 || emission.g != 0 || emission.r != 0) &&
+        Color lightEmission = light->surface->emission;
+        //make sure light emission is not zero and
+        //surface doesnt emit light
+        if( (lightEmission.r != 0 || lightEmission.g != 0 || lightEmission.r != 0) &&
             (surface->emission.r < 1.0f || surface->emission.g < 1.0f || surface->emission.b < 1.0f)) {
-          lightContribution = surface->emission + surface->evaluateBRDF(ray, ray) * emission * glm::dot(normalL, -ray.direction);
+          lightContribution = surface->emission + surface->evaluateBRDF(ray, ray) * lightEmission * glm::dot(normalL, -ray.direction);
         }
       }
       float u1 = rng(engine);
