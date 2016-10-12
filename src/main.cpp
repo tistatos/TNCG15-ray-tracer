@@ -25,9 +25,9 @@ void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double m
   for (unsigned int y = 0; y < HEIGHT; ++y) {
     for (unsigned int x = 0; x < WIDTH; ++x) {
       fprintf(f, "%d %d %d ",
-          int(p[x][y].color.r * 255.99 / maxR),
-          int(p[x][y].color.g * 255.99 / maxG),
-          int(p[x][y].color.b * 255.99 / maxB));
+          (maxR > 0 ? int(p[x][y].color.r * 255.99 / maxR) : 0),
+          (maxG > 0 ? int(p[x][y].color.g * 255.99 / maxG) : 0),
+          (maxB > 0 ? int(p[x][y].color.b * 255.99 / maxB) : 0));
     }
   }
   fclose(f);
@@ -48,6 +48,7 @@ int main() {
   double begin = omp_get_wtime();
 
 #if USE_OMP
+  std::cout << "Using MP..." << std::endl;
   #pragma omp parallel for collapse(2)
 #endif
   for (unsigned int y = 0; y < HEIGHT; ++y) {
@@ -67,7 +68,7 @@ int main() {
   double elapsed_secs = double(end - begin);
 
   std::cout << "Done: " << elapsed_secs  << std::endl;
-  double maxR = 1.0, maxG = 1.0, maxB = 1.0;
+  double maxR = 0.0, maxG = 0.0, maxB = 0.0;
   for (unsigned int y = 0; y < HEIGHT; ++y) {
     for (unsigned int x = 0; x < WIDTH; ++x) {
       maxR = std::max(pixels[x][y].color.r, maxR);
