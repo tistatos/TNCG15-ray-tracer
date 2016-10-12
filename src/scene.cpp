@@ -43,7 +43,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(0.0f, -6.0f, -5.0f),
         glm::vec3(10.0f, -6.0f, -5.0f),
-        new Surface(Color(1.0, 1.0, 1.0)) ) );
+        new Surface(Color(0.8, 0.8, 0.8)) ) );
 
   //Ceiling
   mObjects.push_back(
@@ -74,7 +74,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(-3.0f, 0.0f, 5.0f),
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(0.0f, 6.0f,-5.0f),
-        new Surface(Color(1.0, 1.0, 0.0)) ) );
+        new Surface(Color(0.0, 0.0, 0.0)) ) );
 
   mObjects.push_back(
       new Quad(
@@ -114,12 +114,12 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(0.0f, -6.0f, 5.0f),
         glm::vec3(0.0f, -6.0f, -5.0f),
         glm::vec3(-3.0f, 0.0f,-5.0f),
-        new Surface(Color(0.0, 1.0, 1.0)) ) );
+        new Surface(Color(0.0, 0.0, 0.0)) ) );
 
 
   mObjects.push_back(
       new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 14.9f),
-        new Surface(Color(1.0,1.0, 1.0), Color(1.0f, 1.0f, 1.0f)) )
+        new Surface(Color(1.0,1.0, 1.0), Color(1.0, 1.0, 1.0)) )
       );
 }
 
@@ -164,9 +164,10 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       Color lightContribution;
       if(this->intersect(shadowRay, t, light, true)) {
         Color emission = light->surface->emission;
-        if(emission.r != 0 && emission.g != 0 && emission.r != 0 &&
-            surface->emission.r < 1.0f)
-          lightContribution =  surface->emission + surface->evaluateBRDF(ray, ray) * emission * glm::dot(normalL, -ray.direction);
+        if( (emission.r != 0 || emission.g != 0 || emission.r != 0) &&
+            (surface->emission.r < 1.0f || surface->emission.g < 1.0f || surface->emission.b < 1.0f)) {
+          lightContribution = surface->emission + surface->evaluateBRDF(ray, ray) * emission * glm::dot(normalL, -ray.direction);
+        }
       }
       float u1 = rng(engine);
       float u2 = rng(engine);
@@ -210,14 +211,10 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       float cosTheta = glm::dot(-ray.direction, normalL);
       float Rs = R + (1 - R) * std::pow((1 - cosTheta), 5);
 
-      //eflectedRay = Ray(intersectionPoint, reflected, ray.importance * Rs);
-      //Ray refraay = Ray(refractPoint, refractionDirection, ray.importance * (1- Rs));
-
       Ray reflectedRay = Ray(intersectionPoint, reflected);
       Ray refractedRay = Ray(refractPoint, refractionDirection);
 
       return trace(reflectedRay, depth + 1) * Rs +  trace(refractedRay, depth + 1) * (1-Rs);
-      //return trace(refractedRay, ++depth);
     }
   }
   return Color();
