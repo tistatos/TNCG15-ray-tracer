@@ -14,8 +14,13 @@
 
 Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(7.0f, -3.0f, -0.0f),
-        new Surface(Color(0.0,1.0, 1.0)) )
+      new Sphere(1.0f,glm::vec3(7.0f, 3.0f, -4.0f),
+        new Surface(Color(1.0,1.0, 1.0)) )
+  );
+
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(10.0f, -1.0f, -4.0f),
+        new Surface(Color(1.0,1.0, 1.0)) )
   );
 
   mObjects.push_back(
@@ -23,10 +28,10 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
   );
 
-  //mObjects.push_back(
-      //new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
-        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
-  //);
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
+        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+  );
 
   //Floor
   mObjects.push_back(
@@ -159,6 +164,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
 
     if(surface->reflectionType == Surface::eReflectionType::kDiffuse) {
       //FIXME: hardcoded light vector
+
       Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
       Intersectable* light;
       Color lightContribution;
@@ -173,7 +179,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       }
       float u1 = rng(engine);
       float u2 = rng(engine);
-      Ray mcRay = Ray::sampleHemisphere(intersectionPoint, u1, u2);
+      Ray mcRay = Ray::sampleHemisphere(ray, normalL, u1, u2);
       mcRay.importance = ray.importance;
       return surface->emission + lightContribution + surface->evaluateBRDF(ray, mcRay) * trace(mcRay, ++depth);
     }
