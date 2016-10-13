@@ -8,6 +8,7 @@
 #include <omp.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <iomanip>
 
 #include "scene.h"
 #include "camera.h"
@@ -15,7 +16,7 @@
 
 #define WIDTH 512
 #define HEIGHT 512
-#define SUB_PIXEL_SAMPLES 8
+#define SUB_PIXEL_SAMPLES 4
 #define USE_OMP true
 
 void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double maxG, double maxB) {
@@ -47,6 +48,7 @@ int main() {
 
   double begin = omp_get_wtime();
 
+  unsigned int pixels_completed = 0;
 #if USE_OMP
   std::cout << "Using MP..." << std::endl;
   #pragma omp parallel for collapse(2)
@@ -62,6 +64,11 @@ int main() {
       }
       color = color / SUB_PIXEL_SAMPLES;
       p.setColor(color);
+#pragma omp atomic
+    ++pixels_completed;
+    if(pixels_completed % ((WIDTH*HEIGHT)/50) == 1)
+#pragma omp critical
+      std::cout << "Progress: "<< std::fixed << std::setprecision(1) << 100.0*pixels_completed/(WIDTH*HEIGHT) << "%" << std::endl;
     }
   }
   double end = omp_get_wtime();
