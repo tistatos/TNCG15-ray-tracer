@@ -30,26 +30,28 @@ Color Surface::evaluateBRDF(Ray in, Ray out, glm::vec3 normal) {
 }
 
 Color Surface::evaluateBRDFLambertian() {
-  return this->color * (reflectCoefficient / M_PI);
+  return this->color * reflectCoefficient;
 }
 
+#include<iostream>
 Color Surface::evaluateBRDFOrenNayar(Ray in, Ray out, glm::vec3 normal) {
   //theta inclination
   //phi azimuth
   glm::vec3 inSphere = cartesianToSpherical(-in.direction);
   glm::vec3 outSphere = cartesianToSpherical(out.direction);
-  float sigma = 2.0f;
+  float sigma2 = 0.3f;
 
-  float phiIn = inSphere.x;
-  float thetaIn = inSphere.z;
-  float thetaOut = outSphere.z;
-  float phiOut = outSphere.x;
+  float phiIn = inSphere.y;
+  float thetaIn = acos(glm::dot(-in.direction, normal));
+  float phiOut = outSphere.y;
+  float thetaOut = acos(glm::dot(out.direction, normal));
 
-  float A = 1.0f - (sigma*sigma) / (2.0f*(sigma*sigma + 0.33f));
-  float B = 0.45f * (sigma*sigma) / (2.0f*(sigma*sigma + 0.09f));
+  float A = 1.0f - (sigma2) / (2.0f*(sigma2 + 0.33f));
+  float B = 0.45f * (sigma2) / (sigma2 + 0.09f);
 
   float alpha = std::max(thetaIn, thetaOut);
   float beta = std::min(thetaIn, thetaOut);
 
-  return this->color * reflectCoefficient/M_PI * (A+B * std::max(0.0, cos(phiIn-phiOut)) * sin(alpha) * tan(beta));
+  float on =  reflectCoefficient * (A + B * std::max(0.0f, glm::dot(-in.direction,out.direction)) * sin(alpha) * tan(beta));
+  return this->color * on;
 }

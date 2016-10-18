@@ -14,6 +14,8 @@
 
 #define SceneIterator std::vector<SceneObject*>::const_iterator
 
+#define RUSSIAN_DEPTH 5
+
 class Scene {
 public:
   Scene();
@@ -23,6 +25,7 @@ public:
 
 private:
   std::vector<SceneObject*> mObjects;
+  std::vector<SceneObject*> mLights;
   std::mt19937 engine;
   std::uniform_real_distribution<float> rng;
 };

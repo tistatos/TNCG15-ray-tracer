@@ -14,24 +14,24 @@
 
 Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(7.0f, 3.0f, -4.0f),
+      new Sphere(1.0f,glm::vec3(4.0f, 3.0f, 0.0f),
         new Surface(Color(1.0,1.0, 1.0)) )
   );
 
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(10.0f, -1.0f, -4.0f),
-        new Surface(Color(1.0,1.0, 1.0)) )
+      new Sphere(1.4f,glm::vec3(4.0f, -3.0f, 0.0f),
+        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
   );
 
-  mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
-  );
+  //mObjects.push_back(
+      //new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
+        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
+  //);
 
-  mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
-  );
+  //mObjects.push_back(
+      //new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
+        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+  //);
 
   //Floor
   mObjects.push_back(
@@ -79,7 +79,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(-3.0f, 0.0f, 5.0f),
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(0.0f, 6.0f,-5.0f),
-        new Surface(Color(0.0, 0.0, 0.0)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   mObjects.push_back(
       new Quad(
@@ -111,7 +111,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(10.0f, -6.0f, 5.0f),
         glm::vec3(10.0f, -6.0f, -5.0f),
         glm::vec3(0.0f, -6.0f,-5.0f),
-        new Surface(Color(1.0, 0.0, 1.0)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   mObjects.push_back(
       new Quad(
@@ -119,13 +119,13 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(0.0f, -6.0f, 5.0f),
         glm::vec3(0.0f, -6.0f, -5.0f),
         glm::vec3(-3.0f, 0.0f,-5.0f),
-        new Surface(Color(0.0, 0.0, 0.0)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
-
-  mObjects.push_back(
-      new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 14.9f),
-        new Surface(Color(1.0,1.0, 1.0), Color(1.0, 1.0, 1.0)) )
-      );
+  //Lights
+  SceneObject* topLight = new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 14.9f),
+        new Surface(Color(1.0,1.0, 1.0), Color(1.0, 1.0, 1.0)) );
+  mObjects.push_back(topLight);
+  mLights.push_back(topLight);
 }
 
 Scene::~Scene() {
@@ -153,7 +153,10 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
   Intersectable* intersect;
 
   if(this->intersect(ray, t, intersect)) {
-    if(depth >= 5) return intersect->surface->emission;
+    float termination_probability = RUSSIAN_DEPTH * 0.8/depth;
+    if(depth >= RUSSIAN_DEPTH && rng(engine) > termination_probability) {
+      return intersect->surface->emission;
+    }
 
     glm::vec3 intersectionPoint = ray.start + ray.direction * t;
     glm::vec3 normal = intersect->getNormal(intersectionPoint);
