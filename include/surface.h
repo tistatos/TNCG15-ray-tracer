@@ -32,7 +32,8 @@ public:
   Color color;
   Color emission;
 
-  float reflectCoefficient = 2.0f/M_PI;
+  float reflectCoefficient = 2.0f;
+  float sigma2 = 1.0f;
 
   eReflectionType reflectionType;
 private:

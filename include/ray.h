@@ -19,7 +19,6 @@ class Intersectable;
 class Ray {
 public:
   Ray(glm::vec3 start, glm::vec3 direction);
-  Ray(glm::vec3 start, glm::vec3 direction, Color c);
 
   static Ray sampleHemisphere(Ray radianceOut, glm::vec3 normal, float u1, float u2);
   void setIntersection(Intersectable* intersect);
@@ -29,7 +28,6 @@ public:
 
 public:
   glm::vec3 start, direction;
-  Color importance;
 
 private:
   Intersectable* mIntersect;

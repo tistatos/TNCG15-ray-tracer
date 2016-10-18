@@ -20,7 +20,6 @@ public:
   ~Triangle();
   Triangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2);
   bool rayIntersection(Ray* r, float &tOut);
-
 private:
   glm::vec3 mV0, mV1, mV2;
 };

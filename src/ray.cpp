@@ -8,18 +8,10 @@
 #include "ray.h"
 
 Ray::Ray(glm::vec3 start, glm::vec3 direction) : start(start), direction(direction) {
-  this->importance = Color(1.0, 1.0, 1.0);
   this->normalize();
 }
 
-Ray::Ray(glm::vec3 start, glm::vec3 direction, Color color) : Ray(start, direction) {
-  this->importance = color;
-}
-
 Ray Ray::sampleHemisphere(Ray radianceOut, glm::vec3 normal, float u1, float u2) {
-  // test with perfect reflection
-  //glm::vec3 reflected = glm::normalize(radianceOut.direction - 2.0f * glm::dot(normal, radianceOut.direction) * normal);
-  //return Ray(radianceOut.start, reflected);
 
   glm::vec3 v1 = -glm::normalize(-radianceOut.direction - glm::dot(-radianceOut.direction, normal)*normal);
   glm::vec3 left = glm::cross(v1, normal);

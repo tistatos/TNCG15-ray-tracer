@@ -19,8 +19,7 @@ TEST(triangle, Intersection) {
 
   Ray r(
       glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(-2.0f, 0.0f, 0.0f),
-      Color(0.0, 0.0, 0.0) );
+      glm::vec3(-2.0f, 0.0f, 0.0f));
 
   float tOut = 0;
   bool intersected = false;
@@ -31,8 +30,7 @@ TEST(triangle, Intersection) {
 
   Ray r2(
       glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(-1.0f, 0.49f, 0.0f),
-      Color(0.0, 0.0, 0.0) );
+      glm::vec3(-1.0f, 0.49f, 0.0f));
 
   tOut = 0;
   intersected = t.rayIntersection(&r2, tOut);
@@ -42,8 +40,7 @@ TEST(triangle, Intersection) {
 
   Ray r3(
       glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(1.0f, 0.49f, 0.0f),
-      Color(0.0, 0.0, 0.0) );
+      glm::vec3(1.0f, 0.49f, 0.0f));
 
   tOut = 0;
   intersected = t.rayIntersection(&r3, tOut);
@@ -58,7 +55,6 @@ TEST(triangle, normal) {
       glm::vec3(10.0f, 6.0f, -5.0f));
 
   glm::vec3 normal = t.getNormal(glm::vec3());
-
 
   EXPECT_FLOAT_EQ(normal.x, 0.0f) << "Normal of triangle should only have y part";
   EXPECT_FLOAT_EQ(normal.y, -1.0f) << "Normal of triangle should only have y part";

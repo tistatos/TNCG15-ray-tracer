@@ -14,24 +14,26 @@
 
 Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(4.0f, 3.0f, 0.0f),
-        new Surface(Color(1.0,1.0, 1.0)) )
+      new Sphere(1.0f,glm::vec3(5.0f, 4.0f, -1.0f),
+        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kLambert) )
   );
 
   mObjects.push_back(
-      new Sphere(1.4f,glm::vec3(4.0f, -3.0f, 0.0f),
+      new Sphere(1.0f,glm::vec3(5.0f, -2.0f, -1.0f),
         new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
   );
+  mObjects.at(mObjects.size()-1)->surface->sigma2 = 100.0f;
 
-  //mObjects.push_back(
-      //new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
-        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
-  //);
 
-  //mObjects.push_back(
-      //new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
-        //new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
-  //);
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
+        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
+  );
+
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
+        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
+  );
 
   //Floor
   mObjects.push_back(
@@ -40,7 +42,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(0.0f, 6.0f, -5.0f),
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(13.0f, 0.0f, -5.0f),
-        new Surface(Color(0.8, 0.8, 0.8)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   mObjects.push_back(
       new Quad(
@@ -48,7 +50,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(-3.0f, 0.0f, -5.0f),
         glm::vec3(0.0f, -6.0f, -5.0f),
         glm::vec3(10.0f, -6.0f, -5.0f),
-        new Surface(Color(0.8, 0.8, 0.8)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   //Ceiling
   mObjects.push_back(
@@ -57,14 +59,14 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(0.0f, 6.0f, 5.0f),
         glm::vec3(-3.0f, 0.0f, 5.0f),
         glm::vec3(13.0f, 0.0f, 5.0f),
-        new Surface(Color(0.4, 0.4, 0.4)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
   mObjects.push_back(
       new Quad(
         glm::vec3(13.0f, 0.0f, 5.0f),
         glm::vec3(-3.0f, 0.0f, 5.0f),
         glm::vec3(0.0f, -6.0f, 5.0f),
         glm::vec3(10.0f, -6.0f, 5.0f),
-        new Surface(Color(0.4, 0.4, 0.4)) ) );
+        new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   //Walls
   /**    2
@@ -124,6 +126,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   //Lights
   SceneObject* topLight = new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 14.9f),
         new Surface(Color(1.0,1.0, 1.0), Color(1.0, 1.0, 1.0)) );
+
   mObjects.push_back(topLight);
   mLights.push_back(topLight);
 }
@@ -166,24 +169,25 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
 
     if(surface->reflectionType == Surface::eReflectionType::kLambert || surface->reflectionType == Surface::eReflectionType::kOrenNayar) {
 
-      //FIXME: hardcoded light vector
-      Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
-      Intersectable* light;
       Color lightContribution;
-      if(this->intersect(shadowRay, t, light, true)) {
-        Color lightEmission = light->surface->emission;
-        //make sure light emission is not zero and
-        //surface doesnt emit light
-        if( (lightEmission.r != 0 || lightEmission.g != 0 || lightEmission.r != 0) &&
-            (surface->emission.r < 1.0f || surface->emission.g < 1.0f || surface->emission.b < 1.0f)) {
-          lightContribution = surface->emission + surface->evaluateBRDF(ray, shadowRay, normalL) * lightEmission * glm::dot(normalL, -ray.direction);
+      for(int i = 0; i < mLights.size(); i++) {
+        //FIXME: hardcoded light vector
+        Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
+        Intersectable* light;
+        if(this->intersect(shadowRay, t, light, true)) {
+          Color lightEmission = light->surface->emission;
+          //make sure light emission is not zero and
+          //surface doesnt emit light
+          if( (lightEmission.r != 0 || lightEmission.g != 0 || lightEmission.r != 0) &&
+              (surface->emission.r < 1.0f || surface->emission.g < 1.0f || surface->emission.b < 1.0f)) {
+            lightContribution = lightContribution + surface->emission + surface->evaluateBRDF(ray, shadowRay, normalL) * lightEmission * glm::dot(normalL, -ray.direction);
+          }
         }
       }
       float u1 = rng(engine);
       float u2 = rng(engine);
       ray.start = intersectionPoint;
       Ray mcRay = Ray::sampleHemisphere(ray, normalL, u1, u2);
-      mcRay.importance = ray.importance;
       return surface->emission + lightContribution + surface->evaluateBRDF(ray, mcRay, normalL) * trace(mcRay, ++depth);
     }
     else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {

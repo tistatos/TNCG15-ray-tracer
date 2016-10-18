@@ -16,6 +16,7 @@
 
 #define RUSSIAN_DEPTH 5
 
+
 class Scene {
 public:
   Scene();

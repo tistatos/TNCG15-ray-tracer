@@ -18,7 +18,7 @@ const int CAMERA_RESOLUTION = 1000;
 class Camera {
 public:
   Camera(glm::vec3 position, int width, int height, glm::mat4 perspective);
-  Ray castRay(float x, float y);
+  Ray castRay(float x, float y, float sx, float sy, float subSamples);
 
 private:
   std::mt19937 mEngine;

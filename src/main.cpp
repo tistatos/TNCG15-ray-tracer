@@ -14,9 +14,9 @@
 #include "camera.h"
 #include "pixel.h"
 
-#define WIDTH 512
-#define HEIGHT 512
-#define SUB_PIXEL_SAMPLES 4
+#define WIDTH 256
+#define HEIGHT 256
+#define SUB_PIXEL_SAMPLES 8 // value x value sub samples
 #define USE_OMP true
 
 void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double maxG, double maxB) {
@@ -33,8 +33,6 @@ void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double m
   }
   fclose(f);
 }
-
-
 
 int main() {
   static Pixel pixels[WIDTH][HEIGHT];
@@ -57,12 +55,13 @@ int main() {
     for (unsigned int x = 0; x < WIDTH; ++x) {
       Color color;
       Pixel &p = pixels[x][y];
-      //FIXME: supersampling with randomization
-      for(unsigned int s = 0; s < SUB_PIXEL_SAMPLES; ++s) {
-        Ray ray = camera.castRay(x,y);
+      for(unsigned int sy = 0; sy < SUB_PIXEL_SAMPLES; ++sy)
+        for(unsigned int sx = 0; sx < SUB_PIXEL_SAMPLES; ++sx) {
+
+        Ray ray = camera.castRay(x,y, sx, sy, SUB_PIXEL_SAMPLES);
         color = color + scene.trace(ray, 0);
       }
-      color = color / SUB_PIXEL_SAMPLES;
+      color = color / (SUB_PIXEL_SAMPLES*SUB_PIXEL_SAMPLES);
       p.setColor(color);
 #pragma omp atomic
     ++pixels_completed;
