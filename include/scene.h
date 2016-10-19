@@ -15,6 +15,7 @@
 #define SceneIterator std::vector<SceneObject*>::const_iterator
 
 #define RUSSIAN_DEPTH 5
+#define SHADOW_RAY_SAMPLES 4
 
 
 class Scene {
@@ -25,6 +26,7 @@ public:
   Color trace(Ray &ray, unsigned int depth);
 
 private:
+  glm::vec3 hitLight(SceneObject* light, glm::vec3 from);
   std::vector<SceneObject*> mObjects;
   std::vector<SceneObject*> mLights;
   std::mt19937 engine;

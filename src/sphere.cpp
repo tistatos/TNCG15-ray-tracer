@@ -58,3 +58,11 @@ bool Sphere::rayIntersection(Ray* ray, float &tOut) {
   }
   return false;
 }
+
+glm::vec3 Sphere::getPoint(float u, float v, glm::vec3 from) {
+  return glm::vec3();
+}
+
+float Sphere::getArea() {
+  return mRadius*mRadius*M_PI;
+}

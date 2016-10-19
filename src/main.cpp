@@ -16,7 +16,7 @@
 
 #define WIDTH 256
 #define HEIGHT 256
-#define SUB_PIXEL_SAMPLES 8 // value x value sub samples
+#define SUB_PIXEL_SAMPLES 4 // value x value sub samples
 #define USE_OMP true
 
 void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double maxG, double maxB) {
@@ -26,9 +26,9 @@ void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double m
   for (unsigned int y = 0; y < HEIGHT; ++y) {
     for (unsigned int x = 0; x < WIDTH; ++x) {
       fprintf(f, "%d %d %d ",
-          (maxR > 0 ? int(p[x][y].color.r * 255.99 / maxR) : 0),
-          (maxG > 0 ? int(p[x][y].color.g * 255.99 / maxG) : 0),
-          (maxB > 0 ? int(p[x][y].color.b * 255.99 / maxB) : 0));
+          (maxR > 0 ? int(sqrt(p[x][y].color.r) * 255.99 / maxR) : 0),
+          (maxG > 0 ? int(sqrt(p[x][y].color.g) * 255.99 / maxG) : 0),
+          (maxB > 0 ? int(sqrt(p[x][y].color.b) * 255.99 / maxB) : 0));
     }
   }
   fclose(f);
@@ -67,7 +67,7 @@ int main() {
     ++pixels_completed;
     if(pixels_completed % ((WIDTH*HEIGHT)/50) == 1)
 #pragma omp critical
-      std::cout << "Progress: "<< std::fixed << std::setprecision(1) << 100.0*pixels_completed/(WIDTH*HEIGHT) << "%" << std::endl;
+      std::cout << "Progress: "<< std::fixed << std::setprecision(1) << 100.0*pixels_completed/(WIDTH*HEIGHT) << "%" << std::setprecision(10) << std::endl;
     }
   }
   double end = omp_get_wtime();

@@ -17,7 +17,8 @@ class SceneObject : public Intersectable {
 public:
   Color getColor() { return surface->color; }
   virtual bool rayIntersection(Ray* r, float &tOut) = 0;
-
+  glm::vec3 getPoint(float u, float v, glm::vec3 from) = 0;
+  virtual float getArea() = 0;
 protected:
   Triangle* mTriangles;
 };

@@ -24,7 +24,6 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
   );
   mObjects.at(mObjects.size()-1)->surface->sigma2 = 100.0f;
 
-
   mObjects.push_back(
       new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
         new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
@@ -124,8 +123,12 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         new Surface(Color(1.0, 1.0, 1.0)) ) );
 
   //Lights
-  SceneObject* topLight = new Sphere(10.0f,glm::vec3(8.0f, 0.0f, 14.9f),
-        new Surface(Color(1.0,1.0, 1.0), Color(1.0, 1.0, 1.0)) );
+  SceneObject* topLight = new Quad(
+        glm::vec3(5.0f, 1.0f, 4.999f),
+        glm::vec3(6.0f, 1.0f, 4.999f),
+        glm::vec3(6.0f, -1.0f, 4.999f),
+        glm::vec3(5.0f, -1.0f, 4.999f),
+        new Surface(Color(1.0,1.0, 1.0), Color(10.0, 10.0, 10.0)) );
 
   mObjects.push_back(topLight);
   mLights.push_back(topLight);
@@ -151,6 +154,12 @@ bool Scene::intersect(Ray &ray, float &tOut, Intersectable* &object, bool skipGl
   return tOut < FLT_MAX;
 }
 
+glm::vec3 Scene::hitLight(SceneObject* light, glm::vec3 from) {
+  float u = rng(engine);
+  float v = rng(engine);
+  return light->getPoint(u, v, from);
+}
+
 Color Scene::trace(Ray &ray, unsigned int depth) {
   float t = 0.0f;
   Intersectable* intersect;
@@ -166,29 +175,38 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
     glm::vec3 normalL = glm::dot(normal, ray.direction) < 0 ? normal : -normal;
 
     Surface* surface = intersect->surface;
+    //Terminate on light hit
+    if(surface->emission.r > 0.0 || surface->emission.g > 0.0 || surface->emission.b > 0.0)
+      return intersect->surface->color;
 
     if(surface->reflectionType == Surface::eReflectionType::kLambert || surface->reflectionType == Surface::eReflectionType::kOrenNayar) {
-
-      Color lightContribution;
+      Color totalLightContribution;
       for(int i = 0; i < mLights.size(); i++) {
-        //FIXME: hardcoded light vector
-        Ray shadowRay = Ray(intersectionPoint, glm::vec3(8.0f, 0.0f, 5.0f) - intersectionPoint);
-        Intersectable* light;
-        if(this->intersect(shadowRay, t, light, true)) {
-          Color lightEmission = light->surface->emission;
-          //make sure light emission is not zero and
-          //surface doesnt emit light
-          if( (lightEmission.r != 0 || lightEmission.g != 0 || lightEmission.r != 0) &&
-              (surface->emission.r < 1.0f || surface->emission.g < 1.0f || surface->emission.b < 1.0f)) {
-            lightContribution = lightContribution + surface->emission + surface->evaluateBRDF(ray, shadowRay, normalL) * lightEmission * glm::dot(normalL, -ray.direction);
+        Color lightContribution;
+        SceneObject* light = mLights.at(i);
+        for(int j = 0; j < SHADOW_RAY_SAMPLES; j++) {
+        glm::vec3 lightSpot = hitLight(mLights.at(i), intersectionPoint);
+        Ray shadowRay = Ray(intersectionPoint, lightSpot - intersectionPoint);
+        Intersectable* lightHit;
+        if(this->intersect(shadowRay, t, lightHit, true) && lightHit == light) {
+          float lightDistance = glm::length(lightSpot - intersectionPoint);
+          lightDistance *= lightDistance;
+
+          lightContribution = lightContribution + surface->evaluateBRDF(ray, shadowRay, normalL) *
+            (glm::dot(normalL, -ray.direction) * glm::clamp(glm::dot(light->getNormal(glm::vec3()), -shadowRay.direction), 0.0f, 1.0f) / lightDistance);
           }
         }
+        float lightArea = light->getArea();
+        lightContribution = lightContribution * light->surface->emission * lightArea/SHADOW_RAY_SAMPLES;
+        totalLightContribution = totalLightContribution + lightContribution;
       }
       float u1 = rng(engine);
       float u2 = rng(engine);
+
       ray.start = intersectionPoint;
       Ray mcRay = Ray::sampleHemisphere(ray, normalL, u1, u2);
-      return surface->emission + lightContribution + surface->evaluateBRDF(ray, mcRay, normalL) * trace(mcRay, ++depth);
+
+      return surface->emission + totalLightContribution + surface->evaluateBRDF(ray, mcRay, normalL) * trace(mcRay, ++depth);
     }
     else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
       //Perfect reflection

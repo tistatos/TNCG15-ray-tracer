@@ -46,7 +46,7 @@ Color Surface::evaluateBRDFOrenNayar(Ray in, Ray out, glm::vec3 normal) {
   float alpha = std::max(thetaIn, thetaOut);
   float beta = std::min(thetaIn, thetaOut);
 
-  float orenNayar =  reflectCoefficient / M_PI * (A + B * std::max(0.0f, glm::dot(-in.direction, out.direction)) * sin(alpha) * tan(beta));
+  float orenNayar =  reflectCoefficient / M_PI * (A + B * std::max(0.0f, glm::dot(-in.direction, out.direction)) * sin(alpha) * sin(beta));
 
   return this->color * orenNayar;
 }

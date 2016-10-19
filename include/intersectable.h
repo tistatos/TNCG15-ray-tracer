@@ -21,6 +21,7 @@ public:
   virtual ~Intersectable() { }
   virtual bool rayIntersection(Ray* r, float &tOut) = 0;
   virtual glm::vec3 getNormal(glm::vec3 position) { return mNormal; }
+  virtual glm::vec3 getPoint(float u, float v, glm::vec3 from) = 0;
 public:
   Surface* surface;
 protected:

@@ -55,3 +55,8 @@ bool Triangle::rayIntersection(Ray* r, float &tOut) {
 
   return false;
 }
+
+glm::vec3 Triangle::getPoint(float u, float v, glm::vec3 from) {
+  //NOTE: u+v < 1 !
+  return u * mV0 + v * mV1 + (1-u-v) * mV2;
+}
