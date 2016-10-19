@@ -14,9 +14,9 @@
 #include "camera.h"
 #include "pixel.h"
 
-#define WIDTH 256
-#define HEIGHT 256
-#define SUB_PIXEL_SAMPLES 4 // value x value sub samples
+#define WIDTH 64
+#define HEIGHT 64
+#define SUB_PIXEL_SAMPLES 6 // value x value sub samples
 #define USE_OMP true
 
 void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double maxG, double maxB) {
@@ -26,9 +26,12 @@ void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double m
   for (unsigned int y = 0; y < HEIGHT; ++y) {
     for (unsigned int x = 0; x < WIDTH; ++x) {
       fprintf(f, "%d %d %d ",
-          (maxR > 0 ? int(sqrt(p[x][y].color.r) * 255.99 / maxR) : 0),
-          (maxG > 0 ? int(sqrt(p[x][y].color.g) * 255.99 / maxG) : 0),
-          (maxB > 0 ? int(sqrt(p[x][y].color.b) * 255.99 / maxB) : 0));
+          int(glm::clamp(pow(p[x][y].color.r, 1/1), 0.0, 1.0) * 255),
+          int(glm::clamp(pow(p[x][y].color.g, 1/1), 0.0, 1.0) * 255),
+          int(glm::clamp(pow(p[x][y].color.b, 1/1), 0.0, 1.0) * 255));
+          //(maxR > 0 ? int(glm::clamp(pow(p[x][y].color.r, 1/2.2), 0.0, 1.0) * 255.99 / maxR) : 0),
+          //(maxG > 0 ? int(glm::clamp(pow(p[x][y].color.g, 1/2.2), 0.0, 1.0) * 255.99 / maxG) : 0),
+          //(maxB > 0 ? int(glm::clamp(pow(p[x][y].color.b, 1/2.2), 0.0, 1.0) * 255.99 / maxB) : 0));
     }
   }
   fclose(f);
