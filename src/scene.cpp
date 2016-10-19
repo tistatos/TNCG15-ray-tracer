@@ -13,6 +13,7 @@
 #include "sphere.h"
 
 Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
+  double lightIntensity = 25.0;
   mObjects.push_back(
       new Sphere(1.0f,glm::vec3(5.0f, 4.0f, -1.0f),
         new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kLambert) )
@@ -22,7 +23,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
       new Sphere(1.0f,glm::vec3(5.0f, -2.0f, -1.0f),
         new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
   );
-  mObjects.at(mObjects.size()-1)->surface->sigma2 = 100.0f;
+  mObjects.at(mObjects.size()-1)->surface->sigma2 = 10.0f;
 
   mObjects.push_back(
       new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
@@ -128,7 +129,7 @@ Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
         glm::vec3(6.0f, 1.0f, 4.999f),
         glm::vec3(6.0f, -1.0f, 4.999f),
         glm::vec3(5.0f, -1.0f, 4.999f),
-        new Surface(Color(1.0,1.0, 1.0), Color(10.0, 10.0, 10.0)) );
+        new Surface(Color(1.0,1.0, 1.0), Color(1.0, 1.0, 1.0) * lightIntensity) );
 
   mObjects.push_back(topLight);
   mLights.push_back(topLight);
@@ -165,6 +166,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
   Intersectable* intersect;
 
   if(this->intersect(ray, t, intersect)) {
+    //FIXME: russian roulette based on surface not depth
     float termination_probability = RUSSIAN_DEPTH * 0.8/depth;
     if(depth >= RUSSIAN_DEPTH && rng(engine) > termination_probability) {
       return intersect->surface->emission;
@@ -192,7 +194,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
           float lightDistance = glm::length(lightSpot - intersectionPoint);
           lightDistance *= lightDistance;
 
-          lightContribution = lightContribution + surface->evaluateBRDF(ray, shadowRay, normalL) *
+          lightContribution = lightContribution + surface->evaluateBRDF(ray, shadowRay, normalL) * M_PI *
             (glm::dot(normalL, -ray.direction) * glm::clamp(glm::dot(light->getNormal(glm::vec3()), -shadowRay.direction), 0.0f, 1.0f) / lightDistance);
           }
         }
@@ -206,7 +208,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       ray.start = intersectionPoint;
       Ray mcRay = Ray::sampleHemisphere(ray, normalL, u1, u2);
 
-      return surface->emission + totalLightContribution + surface->evaluateBRDF(ray, mcRay, normalL) * trace(mcRay, ++depth);
+      return surface->emission + totalLightContribution + (surface->evaluateBRDF(ray, mcRay, normalL) * M_PI) * trace(mcRay, ++depth);
     }
     else if(surface->reflectionType == Surface::eReflectionType::kSpecular) {
       //Perfect reflection

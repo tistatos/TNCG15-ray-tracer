@@ -15,7 +15,7 @@
 #define SceneIterator std::vector<SceneObject*>::const_iterator
 
 #define RUSSIAN_DEPTH 5
-#define SHADOW_RAY_SAMPLES 4
+#define SHADOW_RAY_SAMPLES 8
 
 
 class Scene {

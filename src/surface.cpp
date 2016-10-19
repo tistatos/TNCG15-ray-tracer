@@ -21,7 +21,7 @@ Surface::Surface(Color color, Color emission) {
   this->color = color;
   this->emission = emission;
   this->sigma2 = 0.0f;
-  this->reflectCoefficient = 2.5f;
+  this->reflectCoefficient = 0.8f;
 }
 
 Color Surface::evaluateBRDF(Ray in, Ray out, glm::vec3 normal) {
