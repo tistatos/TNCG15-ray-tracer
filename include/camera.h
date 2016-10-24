@@ -10,7 +10,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <random>
 
-#include "pixel.h"
 #include "scene.h"
 
 const int CAMERA_RESOLUTION = 1000;

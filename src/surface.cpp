@@ -7,7 +7,6 @@
 
 #include "surface.h"
 #include <algorithm>
-#include "utils.h"
 
 Surface::Surface() : Surface(Color(0.0, 0.0, 0.0), kLambert) { }
 

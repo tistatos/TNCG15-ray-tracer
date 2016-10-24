@@ -11,7 +11,6 @@
 #include "ray.h"
 #include "color.h"
 #include "glm/glm.hpp"
-#include "utils.h"
 
 class Ray;
 class Surface {

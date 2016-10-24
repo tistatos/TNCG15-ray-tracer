@@ -14,12 +14,12 @@
 #include "camera.h"
 #include "pixel.h"
 
-#define WIDTH 64
-#define HEIGHT 64
-#define SUB_PIXEL_SAMPLES 6 // value x value sub samples
+#define WIDTH  256
+#define HEIGHT 256
+#define SUB_PIXEL_SAMPLES 7 // value x value sub samples
 #define USE_OMP true
 
-void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double maxG, double maxB) {
+void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT]) {
   FILE *f = fopen(fileName, "w");
   fprintf(f, "P3\n%d %d\n%d\n", WIDTH, HEIGHT, 255);
 
@@ -29,15 +29,12 @@ void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT], double maxR, double m
           int(glm::clamp(pow(p[x][y].color.r, 1/1), 0.0, 1.0) * 255),
           int(glm::clamp(pow(p[x][y].color.g, 1/1), 0.0, 1.0) * 255),
           int(glm::clamp(pow(p[x][y].color.b, 1/1), 0.0, 1.0) * 255));
-          //(maxR > 0 ? int(glm::clamp(pow(p[x][y].color.r, 1/2.2), 0.0, 1.0) * 255.99 / maxR) : 0),
-          //(maxG > 0 ? int(glm::clamp(pow(p[x][y].color.g, 1/2.2), 0.0, 1.0) * 255.99 / maxG) : 0),
-          //(maxB > 0 ? int(glm::clamp(pow(p[x][y].color.b, 1/2.2), 0.0, 1.0) * 255.99 / maxB) : 0));
     }
   }
   fclose(f);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   static Pixel pixels[WIDTH][HEIGHT];
 
   Camera camera( glm::vec3(-2.9f, 0.0f, 0.0f), WIDTH, HEIGHT,
@@ -77,17 +74,11 @@ int main() {
   double elapsed_secs = double(end - begin);
 
   std::cout << "Done: " << elapsed_secs  << std::endl;
-  double maxR = 0.0, maxG = 0.0, maxB = 0.0;
-  for (unsigned int y = 0; y < HEIGHT; ++y) {
-    for (unsigned int x = 0; x < WIDTH; ++x) {
-      maxR = std::max(pixels[x][y].color.r, maxR);
-      maxG = std::max(pixels[x][y].color.g, maxG);
-      maxB = std::max(pixels[x][y].color.b, maxB);
-    }
-  }
-  std::cout << "Max values: " << std::endl;
-  std::cout << maxR << " " << maxG << " " << maxB  << std::endl;
-  savePPM("result.ppm", pixels, maxR, maxG, maxB);
+  char filename[64];
+
+  sprintf(filename, "%ix%i_%ip_%isec.ppm", WIDTH, HEIGHT, SUB_PIXEL_SAMPLES, (int)elapsed_secs);
+
+  savePPM(filename, pixels);
 
   return 0;
  }
