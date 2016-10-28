@@ -16,7 +16,7 @@
 
 #define WIDTH  256
 #define HEIGHT 256
-#define SUB_PIXEL_SAMPLES 7 // value x value sub samples
+#define SUB_PIXEL_SAMPLES 4// value x value samples
 #define USE_OMP true
 
 void savePPM(const char* fileName, Pixel p[WIDTH][HEIGHT]) {

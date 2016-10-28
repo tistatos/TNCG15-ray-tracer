@@ -13,28 +13,36 @@
 #include "sphere.h"
 
 Scene::Scene() : engine(std::random_device()()), rng(0.0f, 1.0f) {
-  double lightIntensity = 25.0;
+  double lightIntensity = 35.0;
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(5.0f, 4.0f, -1.0f),
-        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kLambert) )
+      new Sphere(1.0f,glm::vec3(6.0f, 4.0f, -4.0f),
+        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
   );
+  mObjects.at(mObjects.size()-1)->surface->sigma2 = 0.0f;
 
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(5.0f, -2.0f, -1.0f),
+      new Sphere(1.0f,glm::vec3(6.0f, 2.0f, -4.0f),
+        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
+  );
+  mObjects.at(mObjects.size()-1)->surface->sigma2 = 0.5f;
+
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(6.0f, 0.0f, -4.0f),
+        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
+  );
+  mObjects.at(mObjects.size()-1)->surface->sigma2 = 1.0f;
+
+  mObjects.push_back(
+      new Sphere(1.0f,glm::vec3(6.0f, -2.0f, -4.0f),
         new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
   );
   mObjects.at(mObjects.size()-1)->surface->sigma2 = 10.0f;
 
   mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(3.0f, 2.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kRefraction) )
+      new Sphere(1.0f,glm::vec3(6.0f, -4.0f, -4.0f),
+        new Surface(Color(1.0,1.0, 1.0), Surface::eReflectionType::kOrenNayar) )
   );
-
-  mObjects.push_back(
-      new Sphere(1.0f,glm::vec3(3.0f, -4.0f, -3.0f),
-        new Surface(Color(0.0,1.0, 1.0), Surface::eReflectionType::kSpecular) )
-  );
-
+  mObjects.at(mObjects.size()-1)->surface->sigma2 = 100.0f;
   //Floor
   mObjects.push_back(
       new Quad(
@@ -166,7 +174,6 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
   Intersectable* intersect;
 
   if(this->intersect(ray, t, intersect)) {
-    //FIXME: russian roulette based on surface not depth
     float termination_probability = RUSSIAN_DEPTH * 0.8/depth;
     if(depth >= RUSSIAN_DEPTH && rng(engine) > termination_probability) {
       return intersect->surface->emission;
@@ -222,10 +229,10 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
 
       bool entering = glm::dot(normal, normalL) > 0;
 
-      float incidence = glm::dot(normalL, ray.direction);
+      float incidence = glm::dot(normalL, -ray.direction);
 
       float n1 = 1.0f;
-      float n2 = 1.5f;
+      float n2 = 1.65f;
       float refractionIndex = n2;
       if(entering) refractionIndex = n1/n2;
 
@@ -234,7 +241,7 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       if(internalReflection < 0) {
         ray.start = intersectionPoint;
         ray.direction = reflected;
-        return trace(ray, ++depth);
+        return surface->emission + trace(ray, ++depth);
       }
 
       glm::vec3 refractPoint = ray.start + ray.direction * t;
@@ -242,14 +249,22 @@ Color Scene::trace(Ray &ray, unsigned int depth) {
       refractionDirection = glm::normalize(refractionDirection);
 
       //Schlick's approximation
-      float R = ((n1 - n2) * (n1 - n2)) / ((n1 + n2) * (n1 + n2));
-      float cosTheta = glm::dot(-ray.direction, normalL);
+      float R = std::pow((n1 - n2) / (n1 + n2), 2);
+      float cosTheta;
+
+      if(entering) {
+        cosTheta = glm::dot(-ray.direction, normalL);
+      }
+      else {
+        cosTheta = glm::dot(refractionDirection, normal);
+      }
+
       float Rs = R + (1 - R) * std::pow((1 - cosTheta), 5);
 
       Ray reflectedRay = Ray(intersectionPoint, reflected);
       Ray refractedRay = Ray(refractPoint, refractionDirection);
 
-      return trace(reflectedRay, depth + 1) * Rs +  trace(refractedRay, depth + 1) * (1-Rs);
+      return surface->emission + trace(reflectedRay, depth + 1) * Rs +  trace(refractedRay, depth + 1) * (1-Rs);
     }
   }
   return Color();

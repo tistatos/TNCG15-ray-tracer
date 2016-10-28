@@ -16,12 +16,14 @@ Ray Ray::sampleHemisphere(Ray radianceOut, glm::vec3 normal, float u1, float u2)
   glm::vec3 v1 = -glm::normalize(-radianceOut.direction - glm::dot(-radianceOut.direction, normal)*normal);
   glm::vec3 left = glm::cross(v1, normal);
 
-  float r =  sqrt(u1);
+  float term = 1 - u1 * u1;
+
+  float r = sqrt( term > 0.0f ? term : 0.0f);
   float theta = 2 * M_PI * u2;
 
   float x = r * cos(theta);
   float y = r * sin(theta);
-  float z = sqrt( 1-u1 > 0.0f ? 1 - u1 : 0.0f);
+  float z = u1;
 
   glm::vec3 direction = v1*x+left*y+normal*z;
 
